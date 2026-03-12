@@ -413,8 +413,9 @@ function S3({ go }) {
   );
 }
 
-function S4({ go }) {
-  const [msgs, setMsgs] = useState([{ from: "ai", text: "Hi, I'm Ennie. What's been going on with your body today?" }]);
+function S4({ go, setIntakeData }) {
+  const greeting = "Hi, I'm Ennie. Tell me, what's been going on with your body today?";
+  const [msgs, setMsgs] = useState([{ from: "ai", text: greeting }]);
   const [pins, setPins] = useState([]);
   const [input, setInput] = useState("");
   const [step, setStep] = useState(0);
@@ -425,8 +426,47 @@ function S4({ go }) {
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
   const listenerRef = useRef(null);
+  const intake = useRef({ area: "", duration: "", severity: "", description: "" });
 
-  const rep = ["Show me on the body map where you feel it.", "Got it. How long has this been going on?", "Set the severity — 0 to 10.", "Sounds like chronic pain. Does that feel right?", "You qualify for a free session."];
+  useEffect(() => { speak(greeting); return () => stopSpeaking(); }, []);
+
+  function buildReply(step, userText) {
+    var l = userText.toLowerCase();
+    // Extract body part keywords
+    var parts = [];
+    ["neck", "back", "shoulder", "head", "knee", "leg", "arm", "wrist", "hip", "chest", "stomach", "ankle", "foot", "elbow"].forEach(function (p) { if (l.includes(p)) parts.push(p); });
+    var pain = l.includes("pain") || l.includes("sore") || l.includes("hurt") || l.includes("ache") || l.includes("stiff") || l.includes("tight");
+    var area = parts.length > 0 ? parts.join(" and ") : "";
+
+    if (step === 0) {
+      intake.current.area = area || "that area";
+      intake.current.description = userText;
+      if (area) {
+        return "I hear you — " + area + " pain. Can you show me on the body map exactly where you feel it?";
+      }
+      return "Got it. Can you show me on the body map where you feel it?";
+    }
+    if (step === 1) {
+      intake.current.duration = userText;
+      // Parse duration from response
+      if (l.includes("week")) return "So about " + userText.trim() + ". On a scale of 0 to 10, how bad is the " + intake.current.area + " right now?";
+      if (l.includes("month")) return userText.trim() + " — that's been a while. On a scale of 0 to 10, how severe is it right now?";
+      if (l.includes("day")) return "Just " + userText.trim() + ". On a scale of 0 to 10, how would you rate the pain right now?";
+      if (l.includes("year")) return userText.trim() + " — that's significant. On a scale of 0 to 10, how bad is it currently?";
+      return "Got it, " + userText.trim() + ". On a scale of 0 to 10, how severe is the " + intake.current.area + " pain right now?";
+    }
+    if (step === 2) {
+      intake.current.severity = userText.replace(/[^0-9]/g, "") || "7";
+      var sev = parseInt(intake.current.severity) || 7;
+      var sevWord = sev >= 7 ? "quite intense" : sev >= 4 ? "moderate" : "mild";
+      return "A " + sev + " out of 10 — that's " + sevWord + ". So you've had " + intake.current.area + " pain for " + intake.current.duration.trim() + " at a " + sev + ". Does that sound right?";
+    }
+    if (step === 3) {
+      if (setIntakeData) setIntakeData(intake.current);
+      return "Great. Based on what you've told me — " + intake.current.area + " pain, " + intake.current.duration.trim() + ", severity " + intake.current.severity + " — you qualify for a free energy healing session. Let's find you a healer.";
+    }
+    return "Thank you. Let's move on.";
+  }
 
   const send = useCallback((text) => {
     const msg = text || input.trim();
@@ -437,12 +477,12 @@ function S4({ go }) {
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      var reply = rep[step] || "Thanks.";
+      var reply = buildReply(step, msg);
       setMsgs((m) => [...m, { from: "ai", text: reply }]);
       speak(reply);
       if (step === 0) setShowMap(true);
       setStep((s) => s + 1);
-    }, 800);
+    }, 1200);
   }, [input, step]);
 
   const addPin = (pin) => {
@@ -450,7 +490,8 @@ function S4({ go }) {
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      var reply = rep[Math.min(step + 1, rep.length - 1)];
+      var reply = "Got it, I can see where you marked. How long has this been going on?";
+      if (step >= 1) reply = "Noted. How would you rate the pain from 0 to 10?";
       setMsgs((m) => [...m, { from: "ai", text: reply }]);
       speak(reply);
       setStep((s) => Math.max(s, 2));
@@ -660,7 +701,12 @@ function S8({ go }) {
   );
 }
 
-function S9({ go }) {
+function S9({ go, intakeData }) {
+  var area = (intakeData && intakeData.area) || "neck";
+  var sev = (intakeData && intakeData.severity) || "7";
+  var dur = (intakeData && intakeData.duration) || "a while";
+  var greet = "Hi, I can see you've been dealing with " + area + " pain at a " + sev + " out of 10 for " + dur + ". I'm going to start working on that now. Can you tell me — is the pain more on the left or right side?";
+
   const TOTAL = 300;
   const [sec, setSec] = useState(TOTAL);
   const [mode, setMode] = useState("voice");
@@ -670,15 +716,21 @@ function S9({ go }) {
   const sr = useRef(null);
   const [wf, setWf] = useState(0);
   const [pins, setPins] = useState([{ x: 47, y: 22, side: "front", score: 7, label: "Neck" }, { x: 55, y: 38, side: "front", score: 5, label: "Back" }]);
-  const [msgs, setMsgs] = useState([{ from: "system", text: "Round 1 · Session started" }, { from: "healer", text: "Hi. Neck at 7, back at 5. Is the neck pain more left or right?" }]);
-  const [lastH, setLastH] = useState("Is the neck pain more left or right?");
+  const [msgs, setMsgs] = useState([{ from: "system", text: "Round 1 · Session started" }, { from: "healer", text: greet }]);
+  const [lastH, setLastH] = useState(greet);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
   const listenerRef = useRef(null);
+  const userReplies = useRef(0);
 
-  useEffect(() => { speak("Hi. Neck at 7, back at 5. Is the neck pain more left or right?"); return () => stopSpeaking(); }, []);
+  useEffect(() => { speak(greet); return () => stopSpeaking(); }, []);
 
-  var fups = [{ at: 260, text: "Sharp or dull ache?" }, { at: 220, text: "When did it start?" }, { at: 180, text: "Working on it now. Let me know if anything shifts." }, { at: 130, text: "How's the neck now vs when we started?" }];
+  var fups = [
+    { at: 260, text: "Is it a sharp pain or more of a dull ache in your " + area + "?" },
+    { at: 220, text: "OK, I'm focusing on that area now. Just relax and let me know if you feel anything shift." },
+    { at: 180, text: "I'm working on the " + area + " right now. How's it feeling compared to when we started?" },
+    { at: 130, text: "We're making progress. What would you rate the " + area + " pain at now, out of 10?" },
+  ];
 
   useEffect(() => {
     if (sec <= 0) { go("s10"); return; }
@@ -706,31 +758,56 @@ function S9({ go }) {
     return () => clearInterval(t);
   }, []);
 
+  function buildHealerReply(text) {
+    var l = text.toLowerCase();
+    if (l.includes("right")) return "OK, right side. I'm directing energy to the right side of your " + area + " now. Let me know when you feel something.";
+    if (l.includes("left")) return "Got it, left side. Focusing on the left " + area + " area. Take a deep breath and tell me if anything changes.";
+    if (l.includes("sharp")) return "Sharp pain — that helps me focus. I'm going to work specifically on easing that sharpness. Just breathe.";
+    if (l.includes("dull") || l.includes("ache")) return "A dull ache — often that responds well to energy work. I'm easing into it now. Let me know how it feels.";
+    if (l.includes("tingle") || l.includes("warm") || l.includes("heat")) return "That's a great sign — warmth and tingling often mean the energy is flowing. I'll keep going.";
+    if (l.includes("same") || l.includes("no change")) return "That's OK, sometimes it takes a moment. I'm adjusting my approach. Stay relaxed.";
+    if (l.match(/\b[0-9]\b/) || l.match(/\b10\b/)) return "Thank you for the update. I'm continuing to work on bringing that down. Stay with it.";
+    if (l.includes("yes") || l.includes("yeah") || l.includes("ok")) return "Great, let's keep going. I'm still focused on your " + area + ". Tell me if anything shifts.";
+    return "Thank you for sharing that. I'm still working on the " + area + " area. Let me know how you're feeling.";
+  }
+
   // Speech recognition for voice mode
   const sendVoice = useCallback((text) => {
     if (!text) return;
+    userReplies.current++;
     setMsgs((m) => [...m, { from: "user", text }]);
     setInterim("");
     setSp("user");
-    setTimeout(() => setSp("idle"), 1500);
     var l = text.toLowerCase();
-    if (l.includes("better") || l.includes("lighter") || l.includes("eased") || l.includes("shifted") || l.includes("change")) {
+    var improved = l.includes("better") || l.includes("lighter") || l.includes("eased") || l.includes("shifted") || l.includes("change") || l.includes("less");
+
+    if (improved) {
       setSec(TOTAL);
       setRound((r) => r + 1);
       setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) })));
       setTimeout(() => {
         setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Timer reset" }]);
         setTimeout(() => {
-          var t = "Good — I felt that. Continuing.";
+          var t = "Good — I can feel that shift too. The " + area + " is responding. I'll keep working on it.";
           setSp("healer");
           setLastH(t);
           setMsgs((m) => [...m, { from: "healer", text: t }]);
           speak(t);
-          setTimeout(() => setSp("idle"), 2000);
+          setTimeout(() => setSp("idle"), 3000);
         }, 500);
       }, 400);
+    } else {
+      // Reply contextually based on what user said
+      setTimeout(() => {
+        var reply = buildHealerReply(text);
+        setSp("healer");
+        setLastH(reply);
+        setMsgs((m) => [...m, { from: "healer", text: reply }]);
+        speak(reply);
+        setTimeout(() => setSp("idle"), 3000);
+      }, 1500);
     }
-  }, [round]);
+  }, [round, area]);
 
   useEffect(() => {
     if (!isSTTAvailable()) return;
@@ -1488,6 +1565,7 @@ var GROUPS = [
 export default function ENNIEv1_3() {
   const [screen, setScreen] = useState("s1");
   const [nav, setNav] = useState(false);
+  const [intakeData, setIntakeData] = useState({ area: "neck", duration: "two weeks", severity: "7", description: "" });
   var entry = SCREENS[screen] || SCREENS.s1;
   var Comp = entry.comp;
   var label = entry.label;
@@ -1521,7 +1599,7 @@ export default function ENNIEv1_3() {
           </div>
         ) : (
           <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
-            <Comp go={setScreen} />
+            <Comp go={setScreen} intakeData={intakeData} setIntakeData={setIntakeData} />
           </div>
         )}
       </div>
