@@ -4,45 +4,66 @@ const VOICE_ID = "IKosFDmvNlCwcgcWNJ1r"; // Charlie
 let currentAudio = null;
 let queue = [];
 let playing = false;
-let useElevenLabs = !!API_KEY; // will flip to false if ElevenLabs fails
+let audioUnlocked = false;
 
-// Pick a nice female voice for browser fallback
-function getBrowserVoice() {
-  if (typeof window === "undefined" || !window.speechSynthesis) return null;
-  var voices = window.speechSynthesis.getVoices();
-  // Prefer: Samantha (Mac), Google UK English Female, any female en voice
-  var pick = voices.find(v => v.name.includes("Samantha"))
-    || voices.find(v => v.name.includes("Google UK English Female"))
-    || voices.find(v => v.name.includes("Google US English"))
-    || voices.find(v => v.lang.startsWith("en") && v.name.toLowerCase().includes("female"))
-    || voices.find(v => v.lang.startsWith("en"))
-    || null;
-  return pick;
+// Pre-warm audio on first user interaction so autoplay works
+function unlockAudio() {
+  if (audioUnlocked) return;
+  var a = new Audio();
+  a.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
+  a.play().then(function () {
+    audioUnlocked = true;
+    // If there are queued items waiting, start processing
+    if (queue.length > 0 && !playing) processQueue();
+  }).catch(function () {});
+  a.remove();
 }
 
-// Preload voices (some browsers need this)
-if (typeof window !== "undefined" && window.speechSynthesis) {
-  window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-}
-
-function speakBrowser(text) {
-  if (typeof window === "undefined" || !window.speechSynthesis) return Promise.resolve();
-  return new Promise((resolve) => {
-    window.speechSynthesis.cancel(); // clear any pending
-    var utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 0.95;
-    utt.pitch = 1.05;
-    var voice = getBrowserVoice();
-    if (voice) utt.voice = voice;
-    utt.onend = resolve;
-    utt.onerror = resolve;
-    window.speechSynthesis.speak(utt);
+if (typeof window !== "undefined") {
+  ["click", "touchstart", "keydown"].forEach(function (evt) {
+    window.addEventListener(evt, unlockAudio, { once: false, passive: true });
   });
 }
 
+// Cache fetched audio blobs to avoid re-fetching the same text
+var audioCache = {};
+
+async function fetchAudio(text) {
+  if (audioCache[text]) return audioCache[text];
+
+  var res = await fetch("https://api.elevenlabs.io/v1/text-to-speech/" + VOICE_ID, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "xi-api-key": API_KEY,
+    },
+    body: JSON.stringify({
+      text: text,
+      model_id: "eleven_multilingual_v2",
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.8,
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    var errBody = "";
+    try { errBody = await res.text(); } catch (_) {}
+    console.error("[Ennie TTS] ElevenLabs error " + res.status + ":", errBody);
+    return null;
+  }
+
+  var blob = await res.blob();
+  audioCache[text] = blob;
+  return blob;
+}
+
 export async function speak(text) {
-  if (!text) return;
+  if (!API_KEY || !text) {
+    if (!API_KEY) console.warn("[Ennie TTS] No API key — set VITE_ELEVENLABS_API_KEY in .env");
+    return;
+  }
   queue.push(text);
   if (!playing) processQueue();
 }
@@ -54,67 +75,53 @@ export function stopSpeaking() {
     currentAudio.pause();
     currentAudio = null;
   }
-  if (typeof window !== "undefined" && window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
 }
 
 async function processQueue() {
   if (queue.length === 0) { playing = false; return; }
   playing = true;
-  const text = queue.shift();
+  var text = queue.shift();
 
-  // Try ElevenLabs first
-  if (useElevenLabs && API_KEY) {
-    try {
-      const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": API_KEY,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_monolingual_v1",
-          voice_settings: {
-            stability: 0.6,
-            similarity_boost: 0.75,
-          },
-        }),
+  try {
+    var blob = await fetchAudio(text);
+    if (!blob) { processQueue(); return; }
+
+    var url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+
+    await new Promise(function (resolve) {
+      currentAudio.onended = function () { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+      currentAudio.onerror = function (e) {
+        console.error("[Ennie TTS] Audio playback error:", e);
+        URL.revokeObjectURL(url);
+        currentAudio = null;
+        resolve();
+      };
+      currentAudio.play().then(function () {
+        console.log("[Ennie TTS] Playing Charlie voice for:", text.substring(0, 50) + "...");
+      }).catch(function (err) {
+        console.warn("[Ennie TTS] Autoplay blocked — will retry after user interaction:", err.message);
+        // Put it back at the front of the queue so it plays after unlock
+        queue.unshift(text);
+        URL.revokeObjectURL(url);
+        currentAudio = null;
+        playing = false;
+        resolve();
       });
-
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        currentAudio = new Audio(url);
-        await new Promise((resolve) => {
-          currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-          currentAudio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-          currentAudio.play().catch(resolve);
-        });
-        processQueue();
-        return;
-      }
-      // ElevenLabs failed — fall through to browser TTS
-      console.warn("ElevenLabs TTS error:", res.status, "— falling back to browser voice");
-      useElevenLabs = false;
-    } catch (err) {
-      console.warn("ElevenLabs unreachable — falling back to browser voice:", err.message);
-      useElevenLabs = false;
-    }
+    });
+    if (playing) processQueue();
+  } catch (err) {
+    console.error("[Ennie TTS] Fetch failed:", err);
+    processQueue();
   }
-
-  // Browser SpeechSynthesis fallback (always available, free)
-  await speakBrowser(text);
-  processQueue();
 }
 
 export function isTTSAvailable() {
-  return !!(API_KEY || (typeof window !== "undefined" && window.speechSynthesis));
+  return !!API_KEY;
 }
 
 // --- Speech Recognition (STT) ---
-const SpeechRecognition = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
+var SpeechRecognition = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
 
 export function isSTTAvailable() {
   return !!SpeechRecognition;
@@ -122,41 +129,40 @@ export function isSTTAvailable() {
 
 export function createListener(onResult, onStateChange) {
   if (!SpeechRecognition) return null;
-  const rec = new SpeechRecognition();
+  var rec = new SpeechRecognition();
   rec.continuous = false;
   rec.interimResults = true;
   rec.lang = "en-US";
 
-  let active = false;
-  let interim = "";
+  var active = false;
+  var interim = "";
 
-  rec.onresult = (e) => {
-    let final = "";
+  rec.onresult = function (e) {
+    var final = "";
     interim = "";
-    for (let i = 0; i < e.results.length; i++) {
+    for (var i = 0; i < e.results.length; i++) {
       if (e.results[i].isFinal) {
         final += e.results[i][0].transcript;
       } else {
         interim += e.results[i][0].transcript;
       }
     }
-    if (onStateChange) onStateChange({ listening: true, interim });
+    if (onStateChange) onStateChange({ listening: true, interim: interim });
     if (final) {
       onResult(final.trim());
       interim = "";
     }
   };
 
-  rec.onend = () => {
+  rec.onend = function () {
     if (active) {
-      // Auto-restart if still supposed to be listening
       try { rec.start(); } catch (_) {}
     } else {
       if (onStateChange) onStateChange({ listening: false, interim: "" });
     }
   };
 
-  rec.onerror = (e) => {
+  rec.onerror = function (e) {
     if (e.error === "not-allowed") {
       active = false;
       if (onStateChange) onStateChange({ listening: false, interim: "", error: "Microphone access denied" });
@@ -164,17 +170,17 @@ export function createListener(onResult, onStateChange) {
   };
 
   return {
-    start() {
+    start: function () {
       if (active) return;
       active = true;
       if (onStateChange) onStateChange({ listening: true, interim: "" });
       try { rec.start(); } catch (_) {}
     },
-    stop() {
+    stop: function () {
       active = false;
       try { rec.stop(); } catch (_) {}
       if (onStateChange) onStateChange({ listening: false, interim: "" });
     },
-    isActive() { return active; },
+    isActive: function () { return active; },
   };
 }
