@@ -1,5 +1,5 @@
 const API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY;
-const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel - calm, clear female voice
+const VOICE_ID = "IKne3meq5aSn9XLyUdCD"; // Charlie - conversational male Australian voice
 
 let currentAudio = null;
 let queue = [];
