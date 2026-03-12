@@ -240,8 +240,8 @@ function S2({ go }) {
                 <div style={{ flex: 1, height: 1, background: C.border }} />
               </div>
               <div style={{ display: "flex", gap: 10 }}>
-                <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Apple</Btn>
-                <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Google</Btn>
+                <Btn primary={false} onClick={() => go("s3")} style={{ flex: 1, fontSize: 14 }}>Apple</Btn>
+                <Btn primary={false} onClick={() => go("s3")} style={{ flex: 1, fontSize: 14 }}>Google</Btn>
               </div>
             </>
           ) : (
@@ -386,12 +386,16 @@ function S4({ go }) {
         </div>
         <div style={{ padding: "10px 16px 20px", borderTop: "1px solid " + C.border, display: "flex", gap: 8 }}>
           {mode === "text" ? (
-            <>
-              <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Type your response..." style={{ flex: 1, fontSize: 14, padding: "12px 14px" }} />
-              <button onClick={() => send()} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", flexShrink: 0 }}>
-                <span style={{ color: C.white, fontSize: 16 }}>↑</span>
-              </button>
-            </>
+            step >= 5 ? (
+              <Btn onClick={() => go("s6")} style={{ fontSize: 14 }}>Continue →</Btn>
+            ) : (
+              <>
+                <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Type your response..." style={{ flex: 1, fontSize: 14, padding: "12px 14px" }} />
+                <button onClick={() => send()} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", flexShrink: 0 }}>
+                  <span style={{ color: C.white, fontSize: 16 }}>↑</span>
+                </button>
+              </>
+            )
           ) : (
             <Btn onClick={() => { if (step >= 5) go("s6"); else simV(); }} style={{ fontSize: 14 }}>
               {step >= 5 ? "Continue →" : "Tap to simulate voice"}
@@ -641,7 +645,7 @@ function S9({ go }) {
                   <span style={{ color: C.muted, fontSize: 13 }}>Simulate voice</span>
                 </div>
                 <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
-                <button style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
+                <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
               </div>
             </div>
           </>
@@ -676,7 +680,7 @@ function S9({ go }) {
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ flex: 1, padding: "10px 14px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.white }}>I feel a change</button>
                 <button onClick={() => go("s10")} style={{ padding: "0 14px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 12, color: C.black }}>End</button>
-                <button style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
+                <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
               </div>
             </div>
           </>
@@ -755,9 +759,31 @@ function S12({ go }) {
           <p style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>Step {step + 1} of 3</p>
           {step === 0 && (
             <>
-              <Inp placeholder="Language" style={{ marginBottom: 10 }} />
-              <Inp placeholder="Healing modality" style={{ marginBottom: 10 }} />
-              <Inp placeholder="Timezone" style={{ marginBottom: 16 }} />
+              <select style={{ width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "14px 16px", color: C.black, fontSize: 15, fontFamily: ff, marginBottom: 10, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}>
+                <option value="">Language</option>
+                <option>English</option>
+                <option>Spanish</option>
+                <option>French</option>
+                <option>Portuguese</option>
+                <option>Mandarin</option>
+              </select>
+              <select style={{ width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "14px 16px", color: C.black, fontSize: 15, fontFamily: ff, marginBottom: 10, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}>
+                <option value="">Healing modality</option>
+                <option>Reiki</option>
+                <option>Pranic healing</option>
+                <option>Therapeutic touch</option>
+                <option>Quantum touch</option>
+                <option>Other energy healing</option>
+              </select>
+              <select style={{ width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "14px 16px", color: C.black, fontSize: 15, fontFamily: ff, marginBottom: 16, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}>
+                <option value="">Timezone</option>
+                <option>UTC-8 (Pacific)</option>
+                <option>UTC-5 (Eastern)</option>
+                <option>UTC+0 (GMT)</option>
+                <option>UTC+1 (CET)</option>
+                <option>UTC+8 (SGT)</option>
+                <option>UTC+10 (AEST)</option>
+              </select>
               <Btn onClick={() => setStep(1)}>Next</Btn>
             </>
           )}
@@ -1045,8 +1071,8 @@ function S18({ go }) {
       <div style={{ flex: 1, padding: "0 20px 32px" }}>
         <WCard>
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-            <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Apple Pay</Btn>
-            <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Google Pay</Btn>
+            <Btn primary={false} onClick={() => go("sq")} style={{ flex: 1, fontSize: 14 }}>Apple Pay</Btn>
+            <Btn primary={false} onClick={() => go("sq")} style={{ flex: 1, fontSize: 14 }}>Google Pay</Btn>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "12px 0" }}>
             <div style={{ flex: 1, height: 1, background: C.border }} />
@@ -1067,21 +1093,33 @@ function S18({ go }) {
 }
 
 function S20({ go }) {
+  const [values, setValues] = useState({ "Display name": "User", "Email": "user@example.com", "Language": "English", "Notifications": "On", "Payment methods": "None" });
+  const selStyle = { width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "12px 16px", color: C.black, fontSize: 14, fontFamily: ff, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" };
+  var settingsConfig = [
+    { key: "Display name", options: ["User", "Anonymous", "Custom"] },
+    { key: "Email", options: ["user@example.com", "Change email"] },
+    { key: "Language", options: ["English", "Spanish", "French", "Portuguese", "Mandarin"] },
+    { key: "Notifications", options: ["On", "Off", "Quiet hours only"] },
+    { key: "Payment methods", options: ["None", "Add card", "Apple Pay", "Google Pay"] },
+  ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <div style={{ background: C.purple, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.black, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: ff }}>Settings</h2>
       </div>
       <div style={{ flex: 1, padding: "16px 20px", overflowY: "auto" }}>
-        {["Display name", "Email", "Language", "Notifications", "Payment methods"].map((x) => (
-          <div key={x} style={{ padding: "16px 0", borderBottom: "1px solid " + C.border, display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 15, fontWeight: 500 }}>{x}</span>
-            <span style={{ color: C.muted }}>→</span>
+        {settingsConfig.map((item) => (
+          <div key={item.key} style={{ padding: "12px 0", borderBottom: "1px solid " + C.border }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: C.muted, margin: "0 0 6px" }}>{item.key}</p>
+            <select value={values[item.key]} onChange={(e) => setValues((v) => ({ ...v, [item.key]: e.target.value }))} style={selStyle}>
+              {item.options.map((o) => <option key={o} value={o}>{o}</option>)}
+            </select>
           </div>
         ))}
         <div style={{ padding: "16px 0", cursor: "pointer" }} onClick={() => go("s1")}>
           <span style={{ fontSize: 15, fontWeight: 500, color: C.red }}>Delete account</span>
         </div>
+        <Btn onClick={() => go("s21")} style={{ marginTop: 16 }}>Save & return home</Btn>
       </div>
       <TabBar go={go} active="Settings" />
     </div>
