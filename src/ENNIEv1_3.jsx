@@ -194,7 +194,7 @@ function Pill({ children, active, onClick, style }) {
 }
 
 function Tag({ children }) {
-  return <span style={{ fontSize: 11, background: C.pp, color: C.pd, borderRadius: 999, padding: "4px 12px", fontWeight: 500 }}>{children}</span>;
+  return <span style={{ fontSize: 11, background: C.bg, color: C.black, borderRadius: 999, padding: "4px 12px", fontWeight: 500 }}>{children}</span>;
 }
 
 function Bubble({ text, from, typing }) {
@@ -202,7 +202,7 @@ function Bubble({ text, from, typing }) {
   return (
     <div style={{ display: "flex", justifyContent: isUser ? "flex-end" : "flex-start", marginBottom: 16 }}>
       {!isUser && (
-        <div style={{ width: 32, height: 32, borderRadius: 10, background: C.pd, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, flexShrink: 0, marginTop: 2 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 10, background: C.black, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, flexShrink: 0, marginTop: 2 }}>
           <span style={{ color: C.white, fontSize: 12, fontWeight: 600 }}>E</span>
         </div>
       )}
@@ -344,7 +344,7 @@ function S1({ go }) {
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.pd }}>
       <div style={{ padding: "28px 28px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 36 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Ico name="hands" size={20} color={C.pd} />
           </div>
           <span style={{ fontWeight: 600, fontSize: 20, color: C.white, fontFamily: ff, letterSpacing: -0.3 }}>Ennie</span>
@@ -380,7 +380,7 @@ function S2({ go }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <Hdr onBack={() => go("s1")} />
       <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
@@ -401,8 +401,8 @@ function S2({ go }) {
             </>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-              <div style={{ width: 80, height: 80, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Ico name="mail" size={36} color={C.pd} />
+              <div style={{ width: 80, height: 80, borderRadius: 999, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Ico name="mail" size={36} color={C.black} />
               </div>
               <h3 style={{ color: C.black, fontWeight: 700, fontSize: 22, fontFamily: ff }}>Check your email</h3>
               <p style={{ color: C.muted, fontSize: 15, textAlign: "center" }}>Magic link sent to<br /><strong style={{ color: C.black }}>{email}</strong></p>
@@ -420,9 +420,9 @@ function SLogin({ go }) {
   const [pass, setPass] = useState("");
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.purple, padding: "12px 20px 20px" }}>
-        <button onClick={() => go("s1")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-          <span style={{ color: C.white, fontSize: 14, fontWeight: 600 }}>✕</span>
+      <div style={{ padding: "16px 24px 20px" }}>
+        <button onClick={() => go("s1")} style={{ width: 32, height: 32, borderRadius: 999, background: C.bg, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+          <span style={{ color: C.black, fontSize: 14, fontWeight: 500 }}>✕</span>
         </button>
         <h2 style={{ fontSize: 26, fontWeight: 700, color: C.black, margin: 0, fontFamily: ff }}>Log in to Ennie</h2>
       </div>
@@ -439,7 +439,7 @@ function SLogin({ go }) {
 function S3({ go }) {
   const [step, setStep] = useState(0);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <Hdr onBack={() => go("s2")} />
       <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
@@ -578,13 +578,13 @@ function S4({ go, setIntakeData }) {
   }, [msgs, typing]);
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <Hdr title="Intake" onBack={() => go("s3")} />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: C.white, borderRadius: "24px 24px 0 0", overflow: "hidden" }}>
         {mode === "voice" && !showMap && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, flex: 1 }}>
             <p style={{ fontSize: 22, fontWeight: 600, color: C.black, marginBottom: 24, fontFamily: ff }}>{listening ? "Listening..." : "Starting mic..."}</p>
-            <div style={{ width: 140, height: 140, borderRadius: 999, background: listening ? C.pp : C.border, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s", animation: listening ? "pulse 2s infinite" : "none" }}>
+            <div style={{ width: 140, height: 140, borderRadius: 999, background: listening ? C.bg : C.border, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s", animation: listening ? "pulse 2s infinite" : "none" }}>
               <Ico name="mic" size={24} color={listening ? C.pd : C.muted} />
             </div>
             {interim && <p style={{ color: C.muted, fontSize: 14, marginTop: 16, fontStyle: "italic", fontFamily: ff }}>{interim}</p>}
@@ -645,21 +645,21 @@ function S6({ go }) {
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
-      <div style={{ background: C.pd, padding: "0 0 24px" }}>
+      <div style={{ background: C.black, padding: "0 0 24px" }}>
         <Hdr onBack={() => go("s4")} light />
         <div style={{ padding: "0 24px" }}>
           <h2 style={{ fontSize: 26, fontWeight: 700, color: C.white, margin: "0 0 4px", fontFamily: ff, letterSpacing: -0.5 }}>Choose your session</h2>
-          <p style={{ color: C.pp, fontSize: 13, margin: 0 }}>Free = test healers · Paid = qualified healers</p>
+          <p style={{ color: C.light, fontSize: 13, margin: 0 }}>Free = test healers · Paid = qualified healers</p>
         </div>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
         {tiers.map((t) => {
           var isSel = sel === t.id;
           return (
-            <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: C.white, borderRadius: 20, padding: "18px 18px", cursor: "pointer", position: "relative", border: isSel ? "2px solid " + C.pd : "1px solid " + C.borderLight, transition: "all 0.2s" }}>
+            <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: C.white, borderRadius: 20, padding: "18px 18px", cursor: "pointer", position: "relative", border: isSel ? "2px solid " + C.black : "1px solid " + C.borderLight, transition: "all 0.2s" }}>
               {t.badge && <span style={{ position: "absolute", top: -9, right: 18, fontSize: 10, fontWeight: 600, background: C.black, color: C.white, padding: "3px 12px", borderRadius: 999 }}>{t.badge}</span>}
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 14, background: t.id === 0 ? C.pp : C.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Ico name={t.icon} size={20} color={C.pd} /></div>
+                <div style={{ width: 42, height: 42, borderRadius: 14, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Ico name={t.icon} size={20} color={C.black} /></div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <span style={{ fontSize: 17, fontWeight: 700, color: C.black, fontFamily: ff }}>{t.name}</span>
@@ -701,17 +701,17 @@ function SQueue({ go }) {
     return () => clearTimeout(t);
   }, []);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <Hdr onBack={() => go("s6")} />
       <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-          <div style={{ width: 72, height: 72, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-            <Ico name="clock" size={32} color={C.pd} />
+          <div style={{ width: 72, height: 72, borderRadius: 999, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <Ico name="clock" size={32} color={C.black} />
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: C.black, margin: "0 0 8px", fontFamily: ff }}>You're in the queue</h2>
           <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Approx 10–20 mins</p>
-          <div style={{ background: C.pp, borderRadius: 16, padding: "20px 24px", marginBottom: 24, minHeight: 70, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <p style={{ color: C.pd, fontSize: 14, fontWeight: 500, margin: 0, lineHeight: 1.5 }}>{tips[tipIdx]}</p>
+          <div style={{ background: C.bg, borderRadius: 16, padding: "20px 24px", marginBottom: 24, minHeight: 70, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: 0, lineHeight: 1.5 }}>{tips[tipIdx]}</p>
           </div>
           <Btn primary={false} onClick={() => go("s6")} style={{ color: C.red, borderColor: C.red }}>Leave queue</Btn>
         </WCard>
@@ -722,11 +722,11 @@ function SQueue({ go }) {
 
 function S7({ go }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <div style={{ flex: 1, padding: "60px 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-          <div style={{ width: 72, height: 72, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-            <Ico name="star" size={32} color={C.pd} />
+          <div style={{ width: 72, height: 72, borderRadius: 999, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <Ico name="star" size={32} color={C.black} />
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: C.black, margin: "0 0 8px", fontFamily: ff }}>It's nearly your turn</h2>
           <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Are you ready to begin?</p>
@@ -742,7 +742,7 @@ function S8({ go }) {
   const [scores, setScores] = useState({ neck: 7, back: 5 });
   var pins = [{ x: 47, y: 22, side: "front", score: scores.neck }, { x: 55, y: 38, side: "front", score: scores.back }];
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <Hdr title="Symptom check" onBack={() => go("s7")} />
       <div style={{ flex: 1, padding: "0 24px 36px", overflowY: "auto" }}>
         <WCard>
@@ -919,7 +919,7 @@ function S9({ go, intakeData }) {
   };
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <CRing seconds={sec} total={TOTAL} size={52} />
@@ -941,7 +941,7 @@ function S9({ go, intakeData }) {
                 <BMap pins={pins} readonly />
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {pins.map((p, i) => (
-                    <div key={i} style={{ background: C.pp, borderRadius: 12, padding: "10px 16px" }}>
+                    <div key={i} style={{ background: C.bg, borderRadius: 12, padding: "10px 16px" }}>
                       <p style={{ color: C.muted, fontSize: 11, margin: 0 }}>{p.label}</p>
                       <p style={{ color: C.black, fontWeight: 700, fontSize: 22, margin: 0 }}>{p.score}<span style={{ fontSize: 13, fontWeight: 500, color: C.muted }}>/10</span></p>
                     </div>
@@ -949,7 +949,7 @@ function S9({ go, intakeData }) {
                 </div>
               </div>
             </div>
-            <div style={{ padding: "20px 24px", borderTop: "1px solid " + C.border, background: C.pp + "44" }}>
+            <div style={{ padding: "20px 24px", borderTop: "1px solid " + C.border, background: C.bg }}>
               <WaveBars count={24} maxH={24} active={sp !== "idle" || listening} color={sp === "healer" ? C.pd : C.green} frame={wf} />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8 }}>
                 <div style={{ width: 8, height: 8, borderRadius: 999, background: (sp !== "idle" || listening) ? C.green : C.light }} />
@@ -966,7 +966,7 @@ function S9({ go, intakeData }) {
                 <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + (listening ? C.green : C.border), textAlign: "center", background: listening ? C.green + "11" : "transparent" }}>
                   <span style={{ color: listening ? C.green : C.muted, fontSize: 13 }}>{listening ? "Mic active" : "Mic off"}</span>
                 </div>
-                <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 13, color: C.black }}>End</button>
+                <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.bg, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 13, color: C.black }}>End</button>
                 <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 500, fontSize: 11, color: C.red }}>Help</button>
               </div>
             </div>
@@ -977,7 +977,7 @@ function S9({ go, intakeData }) {
               <BMap pins={pins} readonly small />
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {pins.map((p, i) => (
-                  <div key={i} style={{ background: C.pp, borderRadius: 10, padding: "6px 12px" }}>
+                  <div key={i} style={{ background: C.bg, borderRadius: 10, padding: "6px 12px" }}>
                     <span style={{ color: C.muted, fontSize: 11 }}>{p.label}: </span>
                     <span style={{ fontWeight: 700, color: C.black }}>{p.score}/10</span>
                   </div>
@@ -987,7 +987,7 @@ function S9({ go, intakeData }) {
             <div ref={sr} style={{ flex: 1, overflowY: "auto", padding: "10px 14px" }}>
               {msgs.map((m, i) => {
                 if (m.from === "system") {
-                  return <div key={i} style={{ textAlign: "center", marginBottom: 10 }}><span style={{ color: C.muted, fontSize: 11, background: C.pp, padding: "3px 12px", borderRadius: 999 }}>{m.text}</span></div>;
+                  return <div key={i} style={{ textAlign: "center", marginBottom: 10 }}><span style={{ color: C.muted, fontSize: 11, background: C.bg, padding: "3px 12px", borderRadius: 999 }}>{m.text}</span></div>;
                 }
                 return <Bubble key={i} from={m.from} text={m.text} />;
               })}
@@ -1001,7 +1001,7 @@ function S9({ go, intakeData }) {
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ flex: 1, padding: "10px 14px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 13, color: C.white }}>I feel a change</button>
-                <button onClick={() => go("s10")} style={{ padding: "0 14px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 12, color: C.black }}>End</button>
+                <button onClick={() => go("s10")} style={{ padding: "0 14px", borderRadius: 14, background: C.bg, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 12, color: C.black }}>End</button>
                 <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 500, fontSize: 11, color: C.red }}>Help</button>
               </div>
             </div>
@@ -1018,11 +1018,11 @@ function S10({ go }) {
   const [thx, setThx] = useState(false);
   const [feeling, setFeeling] = useState(null);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <div style={{ flex: 1, padding: "40px 20px 32px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
-          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <Ico name="star" size={26} color={C.pd} />
+          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            <Ico name="star" size={26} color={C.black} />
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: C.black, margin: "0 0 6px", fontFamily: ff }}>Session complete</h2>
           <p style={{ color: C.muted, fontSize: 14, margin: "0 0 20px" }}>Thank you for your session. Here's how your symptoms changed.</p>
@@ -1046,16 +1046,16 @@ function S10({ go }) {
               </div>
             </div>
           ))}
-          <div style={{ background: C.pp, borderRadius: 14, padding: 14, margin: "16px 0" }}>
-            <p style={{ color: C.pd, fontSize: 14, fontWeight: 500, margin: "0 0 8px" }}>How are you feeling overall?</p>
+          <div style={{ background: C.bg, borderRadius: 14, padding: 14, margin: "16px 0" }}>
+            <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: "0 0 8px" }}>How are you feeling overall?</p>
             {!feeling ? (
               <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
                 {["Much better", "A little better", "About the same"].map((f) => (
-                  <button key={f} onClick={() => setFeeling(f)} style={{ padding: "8px 12px", borderRadius: 12, border: "1.5px solid " + C.pd, background: C.white, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 500, color: C.pd }}>{f}</button>
+                  <button key={f} onClick={() => setFeeling(f)} style={{ padding: "8px 12px", borderRadius: 12, border: "1.5px solid " + C.border, background: C.white, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 500, color: C.black }}>{f}</button>
                 ))}
               </div>
             ) : (
-              <p style={{ color: C.pd, fontSize: 13, margin: 0 }}>You said: <strong>{feeling}</strong></p>
+              <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>You said: <strong>{feeling}</strong></p>
             )}
           </div>
           <p style={{ color: C.muted, fontSize: 12, fontStyle: "italic", margin: "0 0 16px" }}>We'll check in with you in 24 hours.</p>
@@ -1076,11 +1076,11 @@ function S11({ go }) {
   const [feeling, setFeeling] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <div style={{ flex: 1, padding: "40px 20px 32px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
-          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <Ico name="bell" size={26} color={C.pd} />
+          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            <Ico name="bell" size={26} color={C.black} />
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: C.black, margin: "0 0 6px", fontFamily: ff }}>24-Hour Follow-up</h2>
           <p style={{ color: C.muted, fontSize: 14, margin: "0 0 20px" }}>It's been 24 hours since your session. How are your symptoms now?</p>
@@ -1095,16 +1095,16 @@ function S11({ go }) {
                   <Slider value={v} onChange={(val) => { haptic(); setScores((s) => ({ ...s, [k]: val })); }} color={v <= 2 ? C.green : v <= 5 ? C.amber : C.pd} />
                 </div>
               ))}
-              <div style={{ background: C.pp, borderRadius: 14, padding: 14, margin: "8px 0 16px" }}>
-                <p style={{ color: C.pd, fontSize: 14, fontWeight: 500, margin: "0 0 8px" }}>Overall, how are you feeling?</p>
+              <div style={{ background: C.bg, borderRadius: 14, padding: 14, margin: "8px 0 16px" }}>
+                <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: "0 0 8px" }}>Overall, how are you feeling?</p>
                 {!feeling ? (
                   <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                     {["Much better", "A little better", "About the same", "Worse"].map((f) => (
-                      <button key={f} onClick={() => { haptic(); setFeeling(f); }} style={{ padding: "8px 12px", borderRadius: 12, border: "1.5px solid " + C.pd, background: C.white, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 500, color: C.pd }}>{f}</button>
+                      <button key={f} onClick={() => { haptic(); setFeeling(f); }} style={{ padding: "8px 12px", borderRadius: 12, border: "1.5px solid " + C.border, background: C.white, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 500, color: C.black }}>{f}</button>
                     ))}
                   </div>
                 ) : (
-                  <p style={{ color: C.pd, fontSize: 13, margin: 0 }}>You said: <strong>{feeling}</strong></p>
+                  <p style={{ color: C.muted, fontSize: 13, margin: 0 }}>You said: <strong>{feeling}</strong></p>
                 )}
               </div>
               <Btn disabled={!feeling} onClick={() => { haptic("heavy"); setSubmitted(true); }}>Submit follow-up</Btn>
@@ -1397,7 +1397,7 @@ function S16({ go }) {
       <div style={{ flex: 1, padding: "0 24px 36px", overflowY: "auto" }}>
         <WCard>
           <div style={{ width: 60, height: 60, borderRadius: 999, background: C.yp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <Ico name="star" size={26} color={C.pd} />
+            <Ico name="star" size={26} color={C.black} />
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: C.black, margin: "0 0 6px", textAlign: "center", fontFamily: ff }}>Session complete</h2>
           <p style={{ color: C.muted, fontSize: 14, textAlign: "center", margin: "0 0 20px" }}>Here's how the case responded</p>
@@ -1445,19 +1445,19 @@ function S17({ go }) {
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.purple, padding: "16px 24px 28px", borderRadius: "0 0 24px 24px" }}>
+      <div style={{ padding: "16px 24px 24px" }}>
         <Hdr onBack={() => go("s3")} />
         <h2 style={{ fontSize: 28, fontWeight: 700, color: C.black, margin: "0 0 6px", fontFamily: ff }}>Paid sessions</h2>
-        <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>No active symptoms needed — book a qualified healer</p>
+        <p style={{ color: C.muted, fontSize: 14, margin: 0 }}>No active symptoms needed — book a qualified healer</p>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "24px 24px 12px", display: "flex", flexDirection: "column", gap: 14 }}>
         {tiers.map((t) => {
           var isSel = sel === t.id;
           return (
-            <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: C.white, borderRadius: 22, padding: "22px 20px", cursor: "pointer", position: "relative", border: isSel ? "2.5px solid " + C.pd : "1.5px solid " + C.border, boxShadow: isSel ? "0 6px 24px rgba(107,91,212,0.2)" : "0 2px 12px rgba(0,0,0,0.04)", transition: "all 0.25s ease", transform: isSel ? "scale(1.02)" : "scale(1)" }}>
-              {t.badge && <span style={{ position: "absolute", top: -10, right: 20, fontSize: 11, fontWeight: 600, background: t.id === 2 ? C.pd : C.black, color: C.white, padding: "4px 14px", borderRadius: 999, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>{t.badge}</span>}
+            <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: C.white, borderRadius: 22, padding: "22px 20px", cursor: "pointer", position: "relative", border: isSel ? "2.5px solid " + C.black : "1.5px solid " + C.border, boxShadow: isSel ? "0 6px 24px rgba(0,0,0,0.1)" : "0 2px 12px rgba(0,0,0,0.04)", transition: "all 0.25s ease", transform: isSel ? "scale(1.02)" : "scale(1)" }}>
+              {t.badge && <span style={{ position: "absolute", top: -10, right: 20, fontSize: 11, fontWeight: 600, background: C.black, color: C.white, padding: "4px 14px", borderRadius: 999, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>{t.badge}</span>}
               <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 14, background: t.id === 2 ? C.pp : C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}><Ico name={t.icon} size={22} color={C.pd} /></div>
+                <div style={{ width: 44, height: 44, borderRadius: 14, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}><Ico name={t.icon} size={22} color={C.black} /></div>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: 18, fontWeight: 700, color: C.black, fontFamily: ff, display: "block" }}>{t.name}</span>
                   <span style={{ fontSize: 12, color: C.muted }}>{t.type}</span>
@@ -1478,14 +1478,14 @@ function S17({ go }) {
                 </div>
                 <div style={{ flex: 1, background: C.bg, borderRadius: 12, padding: "10px 12px", textAlign: "center" }}>
                   <p style={{ fontSize: 11, color: C.muted, margin: "0 0 2px" }}>Avg result</p>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: C.pd, margin: 0 }}>{t.detail.replace("avg ", "")}</p>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: C.green, margin: 0 }}>{t.detail.replace("avg ", "")}</p>
                 </div>
               </div>
             </div>
           );
         })}
-        <div style={{ background: C.pp, borderRadius: 16, padding: 16, textAlign: "center" }}>
-          <p style={{ color: C.pd, fontSize: 13, margin: 0, fontWeight: 500 }}>Have active symptoms? <span onClick={() => go("s3")} style={{ fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Try a free session</span></p>
+        <div style={{ background: C.bg, borderRadius: 16, padding: 16, textAlign: "center" }}>
+          <p style={{ color: C.muted, fontSize: 13, margin: 0, fontWeight: 500 }}>Have active symptoms? <span onClick={() => go("s3")} style={{ fontWeight: 600, textDecoration: "underline", cursor: "pointer" }}>Try a free session</span></p>
         </div>
       </div>
       <div style={{ padding: "12px 20px 28px", background: C.white, borderTop: "1px solid " + C.border }}>
@@ -1499,7 +1499,7 @@ function S17({ go }) {
 
 function S18({ go }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <Hdr title="Payment" onBack={() => go("s6")} />
       <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard>
@@ -1537,7 +1537,7 @@ function S20({ go }) {
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.pd, padding: "28px 28px 28px", borderRadius: "0 0 24px 24px" }}>
+      <div style={{ background: C.black, padding: "28px 28px 28px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.white, fontWeight: 600, fontSize: 24, margin: 0, fontFamily: ff, letterSpacing: -0.3 }}>Settings</h2>
       </div>
       <div style={{ flex: 1, padding: "24px 24px", overflowY: "auto" }}>
@@ -1576,7 +1576,7 @@ function S22({ go }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
           <h2 style={{ color: C.black, fontWeight: 600, fontSize: 24, margin: 0, fontFamily: ff, letterSpacing: -0.3 }}>Your sessions</h2>
           <div style={{ display: "flex", gap: 6 }}>
-            <Pill active={true} onClick={() => {}} style={{ fontSize: 12, padding: "6px 16px", background: C.pd, color: C.white, border: "none" }}>Home</Pill>
+            <Pill active={true} onClick={() => {}} style={{ fontSize: 12, padding: "6px 16px", background: C.black, color: C.white, border: "none" }}>Home</Pill>
             <Pill active={false} onClick={() => go("s20")} style={{ fontSize: 12, padding: "6px 16px" }}>Settings</Pill>
           </div>
         </div>
@@ -1620,7 +1620,7 @@ function S21({ go }) {
             </div>
             <span style={{ fontWeight: 600, fontSize: 18, color: C.black, fontFamily: ff, letterSpacing: -0.2 }}>Ennie</span>
           </div>
-          <Badge color={C.pd} bg={C.bg}>3 sessions</Badge>
+          <Badge color={C.muted} bg={C.bg}>3 sessions</Badge>
         </div>
         <h2 style={{ color: C.black, fontWeight: 700, fontSize: 24, margin: "0 0 4px", fontFamily: ff, letterSpacing: -0.5 }}>Your healing journey</h2>
         <p style={{ color: C.muted, fontSize: 14, fontWeight: 400, margin: 0 }}>At a glance</p>
@@ -1665,22 +1665,22 @@ function S21({ go }) {
 
 function S19({ go }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <Hdr onBack={() => go("s21")} />
       <div style={{ flex: 1, padding: "0 24px 36px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
-          <div style={{ width: 100, height: 100, borderRadius: 999, background: C.pl, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", border: "3px solid " + C.pd }}>
-            <Ico name="hands" size={40} color={C.pd} />
+          <div style={{ width: 100, height: 100, borderRadius: 999, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", border: "3px solid " + C.borderLight }}>
+            <Ico name="hands" size={40} color={C.black} />
           </div>
           <h2 style={{ fontSize: 26, fontWeight: 700, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Charlie Goldsmith</h2>
-          <p style={{ color: C.pd, fontSize: 13, fontWeight: 500, margin: "0 0 16px" }}>World-renowned energy healer</p>
+          <p style={{ color: C.muted, fontSize: 13, fontWeight: 500, margin: "0 0 16px" }}>World-renowned energy healer</p>
           <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.7, margin: "0 0 20px", textAlign: "left" }}>
             Charlie Goldsmith is an internationally recognized energy healer whose abilities have been tested and validated in peer-reviewed clinical trials. He has been featured on major media outlets worldwide.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
             {[["80%+", "Success rate"], ["10K+", "Sessions"], ["20+", "Countries"]].map(([v, l], i) => (
-              <div key={i} style={{ background: C.pp, borderRadius: 14, padding: 12, textAlign: "center" }}>
-                <p style={{ fontWeight: 700, fontSize: 18, margin: 0, color: C.pd }}>{v}</p>
+              <div key={i} style={{ background: C.bg, borderRadius: 14, padding: 12, textAlign: "center" }}>
+                <p style={{ fontWeight: 700, fontSize: 18, margin: 0, color: C.black }}>{v}</p>
                 <p style={{ fontSize: 10, color: C.muted, margin: "2px 0 0" }}>{l}</p>
               </div>
             ))}
@@ -1688,8 +1688,8 @@ function S19({ go }) {
           <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.7, margin: "0 0 20px", textAlign: "left" }}>
             Ennie was built by Charlie to make energy healing accessible to anyone, anywhere. Our test healers are put through a rigorous qualification process, and every session is tracked for effectiveness.
           </p>
-          <div style={{ background: C.pp, borderRadius: 14, padding: 16, marginBottom: 20, textAlign: "left" }}>
-            <p style={{ color: C.pd, fontSize: 12, fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>Clinical evidence</p>
+          <div style={{ background: C.bg, borderRadius: 14, padding: 16, marginBottom: 20, textAlign: "left" }}>
+            <p style={{ color: C.muted, fontSize: 12, fontWeight: 600, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>Clinical evidence</p>
             <p style={{ color: C.black, fontSize: 14, lineHeight: 1.6, margin: 0 }}>A peer-reviewed study published in the Journal of Alternative and Complementary Medicine demonstrated statistically significant results from Charlie's energy healing sessions.</p>
           </div>
           <Btn onClick={() => go("s3")}>Try a free session</Btn>
@@ -1711,21 +1711,21 @@ function SSupport({ go }) {
   const [openFaq, setOpenFaq] = useState(null);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
-      <div style={{ background: C.pd, padding: "24px 24px 24px", borderRadius: "0 0 24px 24px" }}>
+      <div style={{ background: C.black, padding: "24px 24px 24px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.white, fontWeight: 700, fontSize: 24, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Support</h2>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 36px" }}>
-        <p style={{ color: C.pd, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>FAQ</p>
+        <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>FAQ</p>
         {faqs.map((f, i) => (
-          <div key={i} onClick={() => { haptic(); setOpenFaq(openFaq === i ? null : i); }} style={{ background: openFaq === i ? C.pp : C.bg, borderRadius: 14, padding: 14, marginBottom: 8, cursor: "pointer", transition: "background 0.2s" }}>
+          <div key={i} onClick={() => { haptic(); setOpenFaq(openFaq === i ? null : i); }} style={{ background: C.bg, borderRadius: 14, padding: 14, marginBottom: 8, cursor: "pointer", transition: "background 0.2s" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontWeight: 500, fontSize: 14, color: C.black }}>{f.q}</span>
-              <span style={{ color: C.pd, fontSize: 16, fontWeight: 600 }}>{openFaq === i ? "−" : "+"}</span>
+              <span style={{ color: C.black, fontSize: 16, fontWeight: 600 }}>{openFaq === i ? "−" : "+"}</span>
             </div>
             {openFaq === i && <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6, margin: "8px 0 0" }}>{f.a}</p>}
           </div>
         ))}
-        <p style={{ color: C.pd, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, margin: "24px 0 12px" }}>Contact us</p>
+        <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, margin: "24px 0 12px" }}>Contact us</p>
         {!sent ? (
           <>
             <Inp value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Describe your issue..." style={{ marginBottom: 12 }} />
@@ -1834,7 +1834,7 @@ function SAdmin({ go }) {
             <div style={{ height: "100%", width: stats.successRate + "%", background: C.green, borderRadius: 999, transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
           </div>
         </div>
-        <p style={{ color: C.pd, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>Recent sessions</p>
+        <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>Recent sessions</p>
         {recent.map((s, i) => (
           <div key={i} onClick={() => { haptic(); setExpanded(expanded === i ? null : i); }} style={{ background: C.white, borderRadius: 16, padding: "14px 16px", marginBottom: 8, cursor: "pointer", boxShadow: "0 1px 6px rgba(0,0,0,0.03)", transition: "all 0.2s" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1918,7 +1918,7 @@ export default function ENNIEv1_3() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: C.bg, padding: 12, fontFamily: ff }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10, width: 390 }}>
-        <span style={{ fontWeight: 700, fontSize: 14, color: C.pd }}>Ennie™</span>
+        <span style={{ fontWeight: 600, fontSize: 14, color: C.black }}>Ennie™</span>
         <span style={{ color: C.muted, fontSize: 12, flex: 1, textAlign: "center" }}>{label}</span>
         <button onClick={() => setNav((n) => !n)} style={{ color: C.black, fontSize: 12, background: C.white, border: "1.5px solid " + C.border, borderRadius: 10, padding: "5px 14px", cursor: "pointer", fontFamily: ff, fontWeight: 500 }}>
           {nav ? "Close" : "All screens"}
@@ -1931,7 +1931,7 @@ export default function ENNIEv1_3() {
             <p style={{ color: C.muted, fontSize: 13, marginBottom: 20 }}>ENNIE v1.3 — Original design</p>
             {GROUPS.map((g) => (
               <div key={g.title} style={{ marginBottom: 20 }}>
-                <p style={{ color: C.pd, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>{g.title}</p>
+                <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>{g.title}</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {g.keys.map((k) => (
                     <button key={k} onClick={() => { setScreen(k); setNav(false); }} style={{ padding: "8px 14px", borderRadius: 12, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: ff, background: screen === k ? C.black : C.white, color: screen === k ? C.white : C.black, border: "1.5px solid " + (screen === k ? C.black : C.border) }}>
