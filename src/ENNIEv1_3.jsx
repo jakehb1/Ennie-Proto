@@ -1,39 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { speak, stopSpeaking, createListener, isSTTAvailable } from "./tts.js";
+import { OpenSelectHandGesture, HomeSimple, GraphUp, Settings, Mail, Microphone, Lock, ArrowRight, Xmark, Check, StarSolid, Flash, Bell, SendDiagonal, InfoCircle, Clock, Shield, Heart, User, Activity, Activity as Pulse } from "iconoir-react";
 
-/* ===== ENNIE ICON SYSTEM ===== */
+/* ===== ENNIE ICON SYSTEM (Iconoir) ===== */
+var iconMap = { hands: OpenSelectHandGesture, home: HomeSimple, chart: GraphUp, gear: Settings, mail: Mail, mic: Microphone, lock: Lock, arrow: ArrowRight, close: Xmark, check: Check, star: StarSolid, bolt: Flash, bell: Bell, send: SendDiagonal, info: InfoCircle, clock: Clock, shield: Shield, heart: Heart, user: User, activity: Activity, pulse: Pulse };
 function Ico({ name, size, color }) {
   var s = size || 20;
   var c = color || "currentColor";
-  var sw = s <= 16 ? "1.5" : "1.75";
-  var paths = {
-    hands: <><path d="M7.5 15.5C6 12 4.5 10.5 3.5 8c-.4-1 .3-2 1.3-1.2.8.7 1.5 2 2.2 3.7" /><path d="M8 10c-.4-2-1-3.5-1.5-5.2-.3-1 .7-1.6 1.2-.5.8 1.8 1.5 3.8 2 5.7" /><path d="M10.5 10c.1-2 .3-4 .2-5.5-.1-1.2 1-1.5 1.2-.2.2 1.8.2 4 .2 5.7" /><path d="M13 10c.2-1.8.4-3.2.6-4.5.2-1.2 1.3-1 1.1.2-.2 1.5-.5 3-.8 4.8" /><path d="M14.5 10.5c.5-.8 1.2-1.6 1.8-2 .7-.5 1 .1.5.8-.6 1-1.5 2-2.3 2.7" /><path d="M7.5 15.5c.3-1.5.8-3 1.8-4.5M14.5 12c-.3.8-1 2-2 3.5H7.5" /></>,
-    home: <><path d="M4 11.5L12 4.5l8 7" /><path d="M6 10v8.5c0 .3.2.5.5.5H10v-4.5h4V19h3.5c.3 0 .5-.2.5-.5V10" /></>,
-    chart: <><path d="M4 20V13c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v7" /><path d="M10 20V8c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v12" /><path d="M16 20V5c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v15" /><line x1="2" y1="20" x2="22" y2="20" /></>,
-    gear: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></>,
-    mail: <><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" /><path d="M3 7l9 6 9-6" /></>,
-    mic: <><path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z" /><path d="M19 10v1a7 7 0 01-14 0v-1" /><line x1="12" y1="19" x2="12" y2="22" /><line x1="8" y1="22" x2="16" y2="22" /></>,
-    lock: <><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /><circle cx="12" cy="16" r="1" /></>,
-    arrow: <><line x1="5" y1="12" x2="19" y2="12" /><polyline points="13 6 19 12 13 18" /></>,
-    close: <><line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" /></>,
-    check: <><polyline points="4 12 9 17 20 6" /></>,
-    star: <><path d="M12 3l2.5 5.5L20 9.5l-4 4 1 5.5L12 16.5 7 19l1-5.5-4-4 5.5-1z" /></>,
-    bolt: <><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" /></>,
-    bell: <><path d="M18 8A6 6 0 006 8c0 3.5-1.5 6-3 7.5h18C19.5 14 18 11.5 18 8z" /><path d="M13.73 21a2 2 0 01-3.46 0" /></>,
-    send: <><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4z" /></>,
-    info: <><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></>,
-    clock: <><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></>,
-    shield: <><path d="M12 2l8 4v6c0 5.5-3.8 8.2-8 10-4.2-1.8-8-4.5-8-10V6z" /></>,
-    heart: <><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1.1L12 21.3l7.8-7.8 1-1.1a5.5 5.5 0 000-7.8z" /></>,
-    user: <><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></>,
-    activity: <><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></>,
-    pulse: <><path d="M2 12h4l3 9 6-18 3 9h4" /></>,
-  };
-  return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
-      {paths[name] || paths.star}
-    </svg>
-  );
+  var sw = s <= 16 ? 1.5 : 1.75;
+  var Icon = iconMap[name] || iconMap.star;
+  return <Icon width={s} height={s} color={c} strokeWidth={sw} style={{ display: "block" }} />;
 }
 
 function haptic(style) {
