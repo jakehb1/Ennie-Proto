@@ -1611,48 +1611,48 @@ function S22({ go }) {
 
 function S21({ go }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
-      <div style={{ background: C.pd, padding: "28px 28px 32px", borderRadius: "0 0 24px 24px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ padding: "28px 28px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Ico name="hands" size={18} color={C.pd} />
             </div>
-            <span style={{ fontWeight: 600, fontSize: 18, color: C.white, fontFamily: ff, letterSpacing: -0.2 }}>Ennie</span>
+            <span style={{ fontWeight: 600, fontSize: 18, color: C.black, fontFamily: ff, letterSpacing: -0.2 }}>Ennie</span>
           </div>
-          <Badge color={C.white} bg="rgba(255,255,255,0.12)">3 sessions</Badge>
+          <Badge color={C.pd} bg={C.bg}>3 sessions</Badge>
         </div>
-        <h2 style={{ color: C.white, fontWeight: 700, fontSize: 24, margin: "0 0 6px", fontFamily: ff, letterSpacing: -0.5 }}>Your healing journey</h2>
-        <p style={{ color: C.pp, fontSize: 14, fontWeight: 400, margin: 0 }}>At a glance</p>
+        <h2 style={{ color: C.black, fontWeight: 700, fontSize: 24, margin: "0 0 4px", fontFamily: ff, letterSpacing: -0.5 }}>Your healing journey</h2>
+        <p style={{ color: C.muted, fontSize: 14, fontWeight: 400, margin: 0 }}>At a glance</p>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "22px 24px 8px" }}>
-        <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "24px 24px 8px" }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
           {[{ t: "Unlimited free sessions with test healers", icon: "star" }, { t: "Rate symptoms in real time", icon: "chart" }].map((item, i) => (
-            <div key={i} style={{ flex: 1, minWidth: 0, background: C.white, borderRadius: 16, padding: "20px 18px", border: "1px solid " + C.borderLight }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                <Ico name={item.icon} size={18} color={C.pd} />
+            <div key={i} style={{ flex: 1, minWidth: 0, background: C.bg, borderRadius: 16, padding: "20px 18px" }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.white, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+                <Ico name={item.icon} size={18} color={C.black} />
               </div>
               <p style={{ fontSize: 14, color: C.black, margin: 0, lineHeight: 1.5, fontWeight: 500 }}>{item.t}</p>
             </div>
           ))}
         </div>
-        <div onClick={() => go("s3")} style={{ background: C.pd, borderRadius: 18, padding: "26px 24px", marginBottom: 14, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div onClick={() => go("s3")} style={{ background: C.black, borderRadius: 18, padding: "26px 24px", marginBottom: 14, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <h3 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 6px", fontFamily: ff, color: C.white, letterSpacing: -0.2 }}>Start a session</h3>
-            <p style={{ fontSize: 13, color: C.pp, fontWeight: 400, margin: 0 }}>Free with test healers</p>
+            <p style={{ fontSize: 13, color: C.light, fontWeight: 400, margin: 0 }}>Free with test healers</p>
           </div>
-          <div style={{ width: 44, height: 44, borderRadius: 14, background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 44, height: 44, borderRadius: 14, background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Ico name="arrow" size={18} color={C.white} />
           </div>
         </div>
         <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-          <div onClick={() => go("s19")} style={{ flex: 1, background: C.white, borderRadius: 16, padding: "20px 18px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
-            <div style={{ marginBottom: 10 }}><Ico name="star" size={20} color={C.pd} /></div>
+          <div onClick={() => go("s19")} style={{ flex: 1, background: C.bg, borderRadius: 16, padding: "20px 18px", cursor: "pointer" }}>
+            <div style={{ marginBottom: 10 }}><Ico name="star" size={20} color={C.black} /></div>
             <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 4px", fontFamily: ff }}>How it works</p>
             <p style={{ fontSize: 13, color: C.muted, fontWeight: 400, margin: 0 }}>Learn about Ennie</p>
           </div>
-          <div onClick={() => go("s17")} style={{ flex: 1, background: C.white, borderRadius: 16, padding: "20px 18px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
-            <div style={{ marginBottom: 10 }}><Ico name="bolt" size={20} color={C.pd} /></div>
+          <div onClick={() => go("s17")} style={{ flex: 1, background: C.bg, borderRadius: 16, padding: "20px 18px", cursor: "pointer" }}>
+            <div style={{ marginBottom: 10 }}><Ico name="bolt" size={20} color={C.black} /></div>
             <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 4px", fontFamily: ff }}>Paid sessions</p>
             <p style={{ fontSize: 13, color: C.muted, fontWeight: 400, margin: 0 }}>Skip the queue</p>
           </div>
