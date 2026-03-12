@@ -35,9 +35,9 @@ const C = {
   pp: "#C4B8F0",
   pd: "#6B5BD4",
   white: "#FFFFFF",
-  black: "#1A1A1A",
-  muted: "#888888",
-  light: "#aaaaaa",
+  black: "#1A1A2E",
+  muted: "#8E8E93",
+  light: "#AEAEB2",
   border: "#E0DCE8",
   borderLight: "#F0EEF5",
   pink: "#F8D4DE",
@@ -94,14 +94,14 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
       disabled={disabled}
       onClick={(e) => { haptic(primary ? "heavy" : undefined); if (onClick) onClick(e); }}
       style={{
-        width: "100%", padding: "17px 24px", borderRadius: 16,
+        width: "100%", padding: "18px 28px", borderRadius: 14,
         fontWeight: 600, fontSize: 16, cursor: disabled ? "default" : "pointer",
         fontFamily: ff, opacity: disabled ? 0.35 : 1,
         background: primary ? C.black : C.white,
         color: primary ? C.white : C.black,
         border: primary ? "none" : "1.5px solid " + C.border,
-        boxShadow: primary ? "0 6px 20px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1)" : "0 2px 8px rgba(0,0,0,0.04)",
-        letterSpacing: 0.3, transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)", ...style,
+        boxShadow: primary ? "0 4px 14px rgba(0,0,0,0.15)" : "none",
+        letterSpacing: 0.2, transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)", ...style,
       }}
     >
       {children}
@@ -147,18 +147,18 @@ function Toggle({ on, onToggle, color }) {
 function Inp({ value, onChange, placeholder, style, onKeyDown, label }) {
   return (
     <div style={{ width: "100%", ...style }}>
-      {label && <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.muted, marginBottom: 6, fontFamily: ff, letterSpacing: 0.3 }}>{label}</label>}
+      {label && <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.muted, marginBottom: 8, fontFamily: ff, letterSpacing: 0.2 }}>{label}</label>}
       <input
         value={value} onChange={onChange} onKeyDown={onKeyDown}
         placeholder={placeholder}
         style={{
-          width: "100%", boxSizing: "border-box", background: "transparent",
-          border: "none", borderBottom: "2px solid " + C.border,
-          padding: "12px 0", color: C.black, fontSize: 15,
-          outline: "none", fontFamily: ff, transition: "border-color 0.2s",
+          width: "100%", boxSizing: "border-box", background: C.bg,
+          border: "none", borderRadius: 12,
+          padding: "14px 16px", color: C.black, fontSize: 15,
+          outline: "none", fontFamily: ff, transition: "box-shadow 0.2s",
         }}
-        onFocus={(e) => { e.target.style.borderBottomColor = C.pd; }}
-        onBlur={(e) => { e.target.style.borderBottomColor = C.border; }}
+        onFocus={(e) => { e.target.style.boxShadow = "0 0 0 2px " + C.pd; }}
+        onBlur={(e) => { e.target.style.boxShadow = "none"; }}
       />
     </div>
   );
@@ -166,7 +166,7 @@ function Inp({ value, onChange, placeholder, style, onKeyDown, label }) {
 
 function WCard({ children, style }) {
   return (
-    <div style={{ background: C.white, borderRadius: 28, padding: 28, boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)", border: "1px solid " + C.borderLight, ...style }}>
+    <div style={{ background: C.white, borderRadius: 20, padding: 32, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", border: "1px solid " + C.borderLight, ...style }}>
       {children}
     </div>
   );
@@ -174,20 +174,20 @@ function WCard({ children, style }) {
 
 function Hdr({ title, onBack, light }) {
   return (
-    <div style={{ padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+    <div style={{ padding: "16px 24px", display: "flex", alignItems: "center", gap: 14 }}>
       {onBack && (
-        <button onClick={onBack} style={{ width: 36, height: 36, borderRadius: 12, background: light ? "rgba(255,255,255,0.15)" : C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ color: C.white, fontSize: 14, fontWeight: 600 }}>✕</span>
+        <button onClick={onBack} style={{ width: 36, height: 36, borderRadius: 12, background: light ? "rgba(255,255,255,0.12)" : C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 500 }}>✕</span>
         </button>
       )}
-      {title && <span style={{ color: light ? C.white : C.black, fontWeight: 700, fontSize: 17, fontFamily: ff, letterSpacing: -0.3 }}>{title}</span>}
+      {title && <span style={{ color: light ? C.white : C.black, fontWeight: 600, fontSize: 17, fontFamily: ff, letterSpacing: -0.2 }}>{title}</span>}
     </div>
   );
 }
 
 function Pill({ children, active, onClick, style }) {
   return (
-    <button onClick={onClick} style={{ fontSize: 13, padding: "7px 18px", borderRadius: 999, fontWeight: 500, border: active ? "none" : "1.5px solid " + C.border, cursor: "pointer", fontFamily: ff, background: active ? C.black : C.white, color: active ? C.white : C.black, transition: "all 0.2s ease", boxShadow: active ? "0 2px 8px rgba(0,0,0,0.12)" : "none", ...style }}>
+    <button onClick={onClick} style={{ fontSize: 13, padding: "8px 20px", borderRadius: 999, fontWeight: 500, border: active ? "none" : "1.5px solid " + C.border, cursor: "pointer", fontFamily: ff, background: active ? C.black : C.white, color: active ? C.white : C.black, transition: "all 0.2s ease", boxShadow: active ? "0 2px 6px rgba(0,0,0,0.1)" : "none", ...style }}>
       {children}
     </button>
   );
@@ -200,14 +200,14 @@ function Tag({ children }) {
 function Bubble({ text, from, typing }) {
   const isUser = from === "user";
   return (
-    <div style={{ display: "flex", justifyContent: isUser ? "flex-end" : "flex-start", marginBottom: 12 }}>
+    <div style={{ display: "flex", justifyContent: isUser ? "flex-end" : "flex-start", marginBottom: 16 }}>
       {!isUser && (
-        <div style={{ width: 30, height: 30, borderRadius: 10, background: C.pd, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 8, flexShrink: 0, marginTop: 2 }}>
-          <span style={{ color: C.white, fontSize: 11, fontWeight: 700 }}>E</span>
+        <div style={{ width: 32, height: 32, borderRadius: 10, background: C.pd, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 10, flexShrink: 0, marginTop: 2 }}>
+          <span style={{ color: C.white, fontSize: 12, fontWeight: 600 }}>E</span>
         </div>
       )}
-      <div style={{ maxWidth: "78%", borderRadius: 20, padding: "13px 18px", fontSize: 15, lineHeight: 1.55, fontFamily: ff, background: isUser ? C.black : C.white, color: isUser ? C.white : C.black, border: isUser ? "none" : "1px solid " + C.borderLight, borderTopLeftRadius: isUser ? 20 : 6, borderTopRightRadius: isUser ? 6 : 20, boxShadow: isUser ? "0 4px 12px rgba(0,0,0,0.12)" : "0 2px 8px rgba(0,0,0,0.04)" }}>
-        {!isUser && <p style={{ color: C.pd, fontSize: 10, fontWeight: 600, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 1.2 }}>Ennie</p>}
+      <div style={{ maxWidth: "78%", borderRadius: 18, padding: "14px 20px", fontSize: 15, lineHeight: 1.6, fontFamily: ff, background: isUser ? C.black : C.white, color: isUser ? C.white : C.black, border: isUser ? "none" : "1px solid " + C.borderLight, borderTopLeftRadius: isUser ? 18 : 4, borderTopRightRadius: isUser ? 4 : 18, boxShadow: isUser ? "0 2px 8px rgba(0,0,0,0.1)" : "none" }}>
+        {!isUser && <p style={{ color: C.pd, fontSize: 10, fontWeight: 500, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 1.2 }}>Ennie</p>}
         {typing ? <span style={{ color: C.muted, fontSize: 20, letterSpacing: 2 }}>···</span> : text}
       </div>
     </div>
@@ -283,11 +283,9 @@ function TabBar({ go, active }) {
       {items.map(function (item) {
         var isActive = active === item[1];
         return (
-          <div key={item[1]} onClick={() => { haptic(); go(item[2]); }} style={{ flex: 1, textAlign: "center", padding: "10px 0 8px", cursor: "pointer", transition: "all 0.2s" }}>
-            <div style={{ width: 28, height: 28, borderRadius: 10, background: isActive ? C.pd + "15" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", transition: "background 0.2s" }}>
-              <Ico name={item[0]} size={18} color={isActive ? C.pd : C.muted} />
-            </div>
-            <p style={{ fontSize: 10, color: isActive ? C.pd : C.muted, fontWeight: isActive ? 700 : 500, margin: 0, letterSpacing: 0.2, fontFamily: ff }}>{item[1]}</p>
+          <div key={item[1]} onClick={() => { haptic(); go(item[2]); }} style={{ flex: 1, textAlign: "center", padding: "14px 0 10px", cursor: "pointer", transition: "all 0.2s" }}>
+            <Ico name={item[0]} size={22} color={isActive ? C.black : C.muted} />
+            <p style={{ fontSize: 11, color: isActive ? C.black : C.muted, fontWeight: isActive ? 600 : 400, margin: "6px 0 0", letterSpacing: 0.1, fontFamily: ff }}>{item[1]}</p>
           </div>
         );
       })}
@@ -344,33 +342,33 @@ function S1({ go }) {
   var swipe = useSwipe(next, prev);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.pd }}>
-      <div style={{ padding: "24px 24px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ padding: "28px 28px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 36 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Ico name="hands" size={20} color={C.pd} />
           </div>
-          <span style={{ fontWeight: 700, fontSize: 20, color: C.white, fontFamily: ff, letterSpacing: -0.5 }}>Ennie™</span>
+          <span style={{ fontWeight: 600, fontSize: 20, color: C.white, fontFamily: ff, letterSpacing: -0.3 }}>Ennie</span>
         </div>
-        <p style={{ color: C.pp, fontSize: 14, fontWeight: 500, margin: "0 0 6px", fontFamily: ff }}>Suffering from pain?</p>
-        <h1 style={{ fontSize: 30, fontWeight: 700, color: C.white, lineHeight: 1.15, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Your energy healing<br />journey begins here</h1>
+        <p style={{ color: C.pp, fontSize: 15, fontWeight: 400, margin: "0 0 8px", fontFamily: ff }}>Suffering from pain?</p>
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.white, lineHeight: 1.2, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Your energy healing<br />journey begins here</h1>
       </div>
-      <div style={{ flex: 1, padding: "24px 24px 0", display: "flex", flexDirection: "column" }}>
-        <div {...swipe} style={{ background: C.white, borderRadius: 24, padding: 24, flex: 1, display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 20 }}>
+      <div style={{ flex: 1, padding: "28px 28px 0", display: "flex", flexDirection: "column" }}>
+        <div {...swipe} style={{ background: C.white, borderRadius: 20, padding: 28, flex: 1, display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 24 }}>
             {slides.map((_, i) => (
               <div key={i} onClick={() => { setSlide(i); haptic(); }} style={{ width: i === slide ? 24 : 8, height: 8, borderRadius: 999, background: i === slide ? C.pd : C.border, transition: "all 0.3s", cursor: "pointer" }} />
             ))}
           </div>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ width: 60, height: 60, borderRadius: 18, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <div style={{ width: 64, height: 64, borderRadius: 16, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
               <Ico name={slides[slide].icon} size={28} color={C.pd} />
             </div>
-            <p style={{ fontSize: 17, fontWeight: 500, color: C.black, textAlign: "center", lineHeight: 1.55, margin: "0 0 20px", fontFamily: ff, minHeight: 54 }}>{slides[slide].text}</p>
+            <p style={{ fontSize: 16, fontWeight: 400, color: C.black, textAlign: "center", lineHeight: 1.6, margin: "0 0 24px", fontFamily: ff, minHeight: 54 }}>{slides[slide].text}</p>
           </div>
-          <HandArt style={{ maxHeight: 130, opacity: 0.6 }} />
+          <HandArt style={{ maxHeight: 130, opacity: 0.5 }} />
         </div>
       </div>
-      <div style={{ padding: "16px 24px 36px", display: "flex", gap: 12 }}>
+      <div style={{ padding: "20px 28px 40px", display: "flex", gap: 14 }}>
         <Btn onClick={() => go("s2")} style={{ flex: 1, background: C.white, color: C.black }}>Join waitlist</Btn>
         <Btn primary={false} onClick={() => go("sLogin")} style={{ flex: 1, background: "transparent", color: C.white, border: "1.5px solid rgba(255,255,255,0.35)" }}>Log in</Btn>
       </div>
@@ -384,7 +382,7 @@ function S2({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <Hdr onBack={() => go("s1")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
           {!sent ? (
             <>
@@ -443,7 +441,7 @@ function S3({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <Hdr onBack={() => go("s2")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
           {step === 0 ? (
             <>
@@ -654,7 +652,7 @@ function S6({ go }) {
           <p style={{ color: C.pp, fontSize: 13, margin: 0 }}>Free = test healers · Paid = qualified healers</p>
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
         {tiers.map((t) => {
           var isSel = sel === t.id;
           return (
@@ -705,14 +703,14 @@ function SQueue({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <Hdr onBack={() => go("s6")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
           <div style={{ width: 72, height: 72, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
             <Ico name="clock" size={32} color={C.pd} />
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: C.black, margin: "0 0 8px", fontFamily: ff }}>You're in the queue</h2>
           <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Approx 10–20 mins</p>
-          <div style={{ background: C.pp, borderRadius: 16, padding: "16px 20px", marginBottom: 24, minHeight: 70, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: C.pp, borderRadius: 16, padding: "20px 24px", marginBottom: 24, minHeight: 70, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <p style={{ color: C.pd, fontSize: 14, fontWeight: 500, margin: 0, lineHeight: 1.5 }}>{tips[tipIdx]}</p>
           </div>
           <Btn primary={false} onClick={() => go("s6")} style={{ color: C.red, borderColor: C.red }}>Leave queue</Btn>
@@ -746,7 +744,7 @@ function S8({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <Hdr title="Symptom check" onBack={() => go("s7")} />
-      <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px", overflowY: "auto" }}>
         <WCard>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: C.black, margin: "0 0 16px", fontFamily: ff }}>Still feeling these?</h2>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}><BMap pins={pins} readonly small /></div>
@@ -951,7 +949,7 @@ function S9({ go, intakeData }) {
                 </div>
               </div>
             </div>
-            <div style={{ padding: "16px 20px", borderTop: "1px solid " + C.border, background: C.pp + "44" }}>
+            <div style={{ padding: "20px 24px", borderTop: "1px solid " + C.border, background: C.pp + "44" }}>
               <WaveBars count={24} maxH={24} active={sp !== "idle" || listening} color={sp === "healer" ? C.pd : C.green} frame={wf} />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8 }}>
                 <div style={{ width: 8, height: 8, borderRadius: 999, background: (sp !== "idle" || listening) ? C.green : C.light }} />
@@ -1132,7 +1130,7 @@ function S12({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
       <Hdr title="Become a test healer" onBack={() => step > 0 ? setStep((s) => s - 1) : go("s1")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
           <p style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>Step {step + 1} of 3</p>
           {step === 0 && (
@@ -1179,7 +1177,7 @@ function S13({ go }) {
       <div style={{ background: C.yellow, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.black, fontWeight: 700, fontSize: 22, margin: 0, fontFamily: ff }}>Healer dashboard</h2>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px 32px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 36px" }}>
         <div style={{ background: on ? C.yp : C.white, border: "1.5px solid " + (on ? C.yd : C.border), borderRadius: 20, padding: 20, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
@@ -1224,7 +1222,7 @@ function S14({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
       <div style={{ padding: "8px 20px" }}><HTag>Healer view</HTag></div>
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Incoming case</h2>
           <p style={{ color: C.muted, fontSize: 13, margin: "0 0 16px" }}>Session starts in {countdown}s</p>
@@ -1396,7 +1394,7 @@ function S16({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
       <div style={{ padding: "8px 20px" }}><HTag>Healer view</HTag></div>
-      <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px", overflowY: "auto" }}>
         <WCard>
           <div style={{ width: 60, height: 60, borderRadius: 999, background: C.yp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
             <Ico name="star" size={26} color={C.pd} />
@@ -1447,12 +1445,12 @@ function S17({ go }) {
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.purple, padding: "16px 24px 28px", borderRadius: "0 0 28px 28px" }}>
+      <div style={{ background: C.purple, padding: "16px 24px 28px", borderRadius: "0 0 24px 24px" }}>
         <Hdr onBack={() => go("s3")} />
         <h2 style={{ fontSize: 28, fontWeight: 700, color: C.black, margin: "0 0 6px", fontFamily: ff }}>Paid sessions</h2>
         <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>No active symptoms needed — book a qualified healer</p>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 12px", display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "24px 24px 12px", display: "flex", flexDirection: "column", gap: 14 }}>
         {tiers.map((t) => {
           var isSel = sel === t.id;
           return (
@@ -1503,7 +1501,7 @@ function S18({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <Hdr title="Payment" onBack={() => go("s6")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard>
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
             <Btn primary={false} onClick={() => go("sq")} style={{ flex: 1, fontSize: 14 }}>Apple Pay</Btn>
@@ -1539,13 +1537,13 @@ function S20({ go }) {
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.pd, padding: "24px 24px 24px", borderRadius: "0 0 28px 28px" }}>
-        <h2 style={{ color: C.white, fontWeight: 700, fontSize: 24, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Settings</h2>
+      <div style={{ background: C.pd, padding: "28px 28px 28px", borderRadius: "0 0 24px 24px" }}>
+        <h2 style={{ color: C.white, fontWeight: 600, fontSize: 24, margin: 0, fontFamily: ff, letterSpacing: -0.3 }}>Settings</h2>
       </div>
-      <div style={{ flex: 1, padding: "16px 20px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "24px 24px", overflowY: "auto" }}>
         {settingsConfig.map((item) => (
-          <div key={item.key} style={{ padding: "12px 0", borderBottom: "1px solid " + C.border }}>
-            <p style={{ fontSize: 13, fontWeight: 500, color: C.muted, margin: "0 0 6px" }}>{item.key}</p>
+          <div key={item.key} style={{ padding: "16px 0", borderBottom: "1px solid " + C.borderLight }}>
+            <p style={{ fontSize: 13, fontWeight: 500, color: C.muted, margin: "0 0 8px" }}>{item.key}</p>
             <select value={values[item.key]} onChange={(e) => setValues((v) => ({ ...v, [item.key]: e.target.value }))} style={selStyle}>
               {item.options.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
@@ -1574,19 +1572,19 @@ function S22({ go }) {
   var chartData = [8, 5, 3];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
-      <div style={{ padding: "24px 24px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <h2 style={{ color: C.black, fontWeight: 700, fontSize: 26, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Your sessions</h2>
-          <div style={{ display: "flex", gap: 4 }}>
-            <Pill active={true} onClick={() => {}} style={{ fontSize: 12, padding: "6px 14px", background: C.pd, color: C.white, border: "none" }}>Home</Pill>
-            <Pill active={false} onClick={() => go("s20")} style={{ fontSize: 12, padding: "6px 14px" }}>Settings</Pill>
+      <div style={{ padding: "28px 24px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+          <h2 style={{ color: C.black, fontWeight: 600, fontSize: 24, margin: 0, fontFamily: ff, letterSpacing: -0.3 }}>Your sessions</h2>
+          <div style={{ display: "flex", gap: 6 }}>
+            <Pill active={true} onClick={() => {}} style={{ fontSize: 12, padding: "6px 16px", background: C.pd, color: C.white, border: "none" }}>Home</Pill>
+            <Pill active={false} onClick={() => go("s20")} style={{ fontSize: 12, padding: "6px 16px" }}>Settings</Pill>
           </div>
         </div>
-        <div style={{ background: C.white, borderRadius: 18, padding: "16px 12px 12px", marginBottom: 20, border: "1px solid " + C.borderLight }}>
+        <div style={{ background: C.white, borderRadius: 16, padding: "20px 16px 16px", marginBottom: 24, border: "1px solid " + C.borderLight }}>
           <Sparkline data={chartData} width={340} height={70} color={C.green} showLabels />
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 20px 8px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 24px 8px" }}>
         {sessions.map((s, i) => (
           <div key={i} style={{ background: C.white, borderRadius: 20, padding: "18px 18px 16px", marginBottom: 10, border: "1px solid " + C.borderLight }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
@@ -1614,49 +1612,49 @@ function S22({ go }) {
 function S21({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
-      <div style={{ background: C.pd, padding: "24px 24px 28px", borderRadius: "0 0 28px 28px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: C.pd, padding: "28px 28px 32px", borderRadius: "0 0 24px 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Ico name="hands" size={18} color={C.pd} />
             </div>
-            <span style={{ fontWeight: 700, fontSize: 18, color: C.white, fontFamily: ff, letterSpacing: -0.3 }}>Ennie™</span>
+            <span style={{ fontWeight: 600, fontSize: 18, color: C.white, fontFamily: ff, letterSpacing: -0.2 }}>Ennie</span>
           </div>
-          <Badge color={C.white} bg="rgba(255,255,255,0.15)">3 sessions</Badge>
+          <Badge color={C.white} bg="rgba(255,255,255,0.12)">3 sessions</Badge>
         </div>
-        <h2 style={{ color: C.white, fontWeight: 700, fontSize: 24, margin: "0 0 4px", fontFamily: ff, letterSpacing: -0.5 }}>Your healing journey</h2>
-        <p style={{ color: C.pp, fontSize: 14, margin: 0 }}>At a glance</p>
+        <h2 style={{ color: C.white, fontWeight: 700, fontSize: 24, margin: "0 0 6px", fontFamily: ff, letterSpacing: -0.5 }}>Your healing journey</h2>
+        <p style={{ color: C.pp, fontSize: 14, fontWeight: 400, margin: 0 }}>At a glance</p>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px 8px" }}>
-        <div style={{ display: "flex", gap: 10, marginBottom: 16, overflowX: "auto", paddingBottom: 4 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "22px 24px 8px" }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
           {[{ t: "Unlimited free sessions with test healers", icon: "star" }, { t: "Rate symptoms in real time", icon: "chart" }].map((item, i) => (
-            <div key={i} style={{ minWidth: 185, background: C.white, borderRadius: 20, padding: "18px 16px", border: "1px solid " + C.borderLight }}>
-              <div style={{ width: 36, height: 36, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+            <div key={i} style={{ minWidth: 185, background: C.white, borderRadius: 16, padding: "20px 18px", border: "1px solid " + C.borderLight }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
                 <Ico name={item.icon} size={18} color={C.pd} />
               </div>
-              <p style={{ fontSize: 13, color: C.black, margin: 0, lineHeight: 1.45, fontWeight: 500 }}>{item.t}</p>
+              <p style={{ fontSize: 14, color: C.black, margin: 0, lineHeight: 1.5, fontWeight: 500 }}>{item.t}</p>
             </div>
           ))}
         </div>
-        <div onClick={() => go("s3")} style={{ background: C.pd, borderRadius: 22, padding: "24px 22px", marginBottom: 12, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div onClick={() => go("s3")} style={{ background: C.pd, borderRadius: 18, padding: "26px 24px", marginBottom: 14, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <h3 style={{ fontSize: 19, fontWeight: 700, margin: "0 0 4px", fontFamily: ff, color: C.white, letterSpacing: -0.3 }}>Start a session</h3>
-            <p style={{ fontSize: 13, color: C.pp, margin: 0 }}>Free with test healers</p>
+            <h3 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 6px", fontFamily: ff, color: C.white, letterSpacing: -0.2 }}>Start a session</h3>
+            <p style={{ fontSize: 13, color: C.pp, fontWeight: 400, margin: 0 }}>Free with test healers</p>
           </div>
-          <div style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 44, height: 44, borderRadius: 14, background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Ico name="arrow" size={18} color={C.white} />
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-          <div onClick={() => go("s19")} style={{ flex: 1, background: C.white, borderRadius: 18, padding: "16px 14px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
-            <div style={{ marginBottom: 8 }}><Ico name="star" size={20} color={C.pd} /></div>
-            <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 2px", fontFamily: ff }}>How it works</p>
-            <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>Learn about Ennie</p>
+        <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
+          <div onClick={() => go("s19")} style={{ flex: 1, background: C.white, borderRadius: 16, padding: "20px 18px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
+            <div style={{ marginBottom: 10 }}><Ico name="star" size={20} color={C.pd} /></div>
+            <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 4px", fontFamily: ff }}>How it works</p>
+            <p style={{ fontSize: 13, color: C.muted, fontWeight: 400, margin: 0 }}>Learn about Ennie</p>
           </div>
-          <div onClick={() => go("s17")} style={{ flex: 1, background: C.white, borderRadius: 18, padding: "16px 14px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
-            <div style={{ marginBottom: 8 }}><Ico name="bolt" size={20} color={C.pd} /></div>
-            <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 2px", fontFamily: ff }}>Paid sessions</p>
-            <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>Skip the queue</p>
+          <div onClick={() => go("s17")} style={{ flex: 1, background: C.white, borderRadius: 16, padding: "20px 18px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
+            <div style={{ marginBottom: 10 }}><Ico name="bolt" size={20} color={C.pd} /></div>
+            <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 4px", fontFamily: ff }}>Paid sessions</p>
+            <p style={{ fontSize: 13, color: C.muted, fontWeight: 400, margin: 0 }}>Skip the queue</p>
           </div>
         </div>
       </div>
@@ -1669,7 +1667,7 @@ function S19({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <Hdr onBack={() => go("s21")} />
-      <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "0 24px 36px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
           <div style={{ width: 100, height: 100, borderRadius: 999, background: C.pl, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", border: "3px solid " + C.pd }}>
             <Ico name="hands" size={40} color={C.pd} />
@@ -1713,10 +1711,10 @@ function SSupport({ go }) {
   const [openFaq, setOpenFaq] = useState(null);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
-      <div style={{ background: C.pd, padding: "24px 24px 24px", borderRadius: "0 0 28px 28px" }}>
+      <div style={{ background: C.pd, padding: "24px 24px 24px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.white, fontWeight: 700, fontSize: 24, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Support</h2>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px 32px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 36px" }}>
         <p style={{ color: C.pd, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>FAQ</p>
         {faqs.map((f, i) => (
           <div key={i} onClick={() => { haptic(); setOpenFaq(openFaq === i ? null : i); }} style={{ background: openFaq === i ? C.pp : C.bg, borderRadius: 14, padding: 14, marginBottom: 8, cursor: "pointer", transition: "background 0.2s" }}>
@@ -1754,7 +1752,7 @@ function S23({ go }) {
         <Hdr onBack={() => go("s20")} />
         <h2 style={{ color: C.red, fontWeight: 700, fontSize: 22, margin: 0, fontFamily: ff }}>Delete Account</h2>
       </div>
-      <div style={{ flex: 1, padding: "24px 20px 32px" }}>
+      <div style={{ flex: 1, padding: "28px 24px 36px" }}>
         {!confirm ? (
           <>
             <div style={{ background: C.red + "11", borderRadius: 14, padding: 16, marginBottom: 20 }}>
@@ -1814,7 +1812,7 @@ function SAdmin({ go }) {
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
-      <div style={{ background: C.green, padding: "20px 24px 28px", borderRadius: "0 0 28px 28px" }}>
+      <div style={{ background: C.green, padding: "20px 24px 28px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.white, fontWeight: 700, fontSize: 24, margin: "0 0 4px", fontFamily: ff }}>Admin Dashboard</h2>
         <p style={{ color: C.white, opacity: 0.8, fontSize: 13, margin: 0 }}>Ennie platform overview</p>
       </div>
