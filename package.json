@@ -1,0 +1,22 @@
+{
+  "name": "ennie-proto",
+  "private": true,
+  "version": "1.3.0",
+  "description": "Ennie v1.3 - Interactive energy healing prototype",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "serve dist -s -l ${PORT:-3000}"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "serve": "^14.2.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.0"
+  }
+}
