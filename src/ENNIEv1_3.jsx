@@ -1,19 +1,42 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { speak, stopSpeaking, createListener, isSTTAvailable } from "./tts.js";
+
+function haptic(style) {
+  if (navigator.vibrate) navigator.vibrate(style === "heavy" ? 30 : 10);
+}
+
+function useSwipe(onLeft, onRight) {
+  const touch = useRef(null);
+  var onStart = useCallback((e) => { touch.current = e.touches[0].clientX; }, []);
+  var onEnd = useCallback((e) => {
+    if (touch.current === null) return;
+    var diff = e.changedTouches[0].clientX - touch.current;
+    touch.current = null;
+    if (diff > 50) onRight();
+    else if (diff < -50) onLeft();
+  }, [onLeft, onRight]);
+  return { onTouchStart: onStart, onTouchEnd: onEnd };
+}
 
 const C = {
-  purple: "#B8A5E8",
-  pl: "#C9BDF0",
-  pp: "#DDD4F5",
-  pd: "#9B8AD4",
+  purple: "#816FE8",
+  pl: "#9B8ADE",
+  pp: "#C4B8F0",
+  pd: "#6B5BD4",
   white: "#FFFFFF",
   black: "#1A1A1A",
   muted: "#888888",
   light: "#aaaaaa",
-  border: "#E8E4F0",
+  border: "#E0DCE8",
   pink: "#F8D4DE",
   green: "#34C759",
   red: "#FF3B30",
   amber: "#FF9500",
+  bg: "#ECEDF7",
+  yellow: "#F5D547",
+  yl: "#FFDE59",
+  yp: "#FFF3C4",
+  yd: "#D4B52E",
 };
 
 const ff = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
@@ -22,15 +45,15 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
   return (
     <button
       disabled={disabled}
-      onClick={onClick}
+      onClick={(e) => { haptic(primary ? "heavy" : undefined); if (onClick) onClick(e); }}
       style={{
-        width: "100%", padding: "16px 20px", borderRadius: 16,
-        fontWeight: 700, fontSize: 16, cursor: disabled ? "default" : "pointer",
+        width: "100%", padding: "16px 20px", borderRadius: 14,
+        fontWeight: 600, fontSize: 16, cursor: disabled ? "default" : "pointer",
         fontFamily: ff, opacity: disabled ? 0.35 : 1,
         background: primary ? C.black : C.white,
         color: primary ? C.white : C.black,
         border: primary ? "none" : "1.5px solid " + C.black,
-        boxShadow: "none", ...style,
+        boxShadow: "none", letterSpacing: 0.2, ...style,
       }}
     >
       {children}
@@ -38,18 +61,21 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
   );
 }
 
-function Inp({ value, onChange, placeholder, style, onKeyDown }) {
+function Inp({ value, onChange, placeholder, style, onKeyDown, label }) {
   return (
-    <input
-      value={value} onChange={onChange} onKeyDown={onKeyDown}
-      placeholder={placeholder}
-      style={{
-        width: "100%", boxSizing: "border-box", background: C.white,
-        border: "1.5px solid " + C.border, borderRadius: 14,
-        padding: "14px 16px", color: C.black, fontSize: 15,
-        outline: "none", fontFamily: ff, ...style,
-      }}
-    />
+    <div style={{ width: "100%", ...style }}>
+      {label && <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.black, marginBottom: 4, fontFamily: ff }}>{label}</label>}
+      <input
+        value={value} onChange={onChange} onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        style={{
+          width: "100%", boxSizing: "border-box", background: "transparent",
+          border: "none", borderBottom: "1.5px solid " + C.border,
+          padding: "10px 0", color: C.black, fontSize: 15,
+          outline: "none", fontFamily: ff,
+        }}
+      />
+    </div>
   );
 }
 
@@ -166,7 +192,7 @@ function CRing({ seconds, total, size = 56 }) {
 }
 
 function TabBar({ go, active }) {
-  var items = [["🏠", "Home", "s21"], ["⊞", "Activity", "s21"], ["⚙️", "Settings", "s20"]];
+  var items = [["🏠", "Home", "s21"], ["⊞", "Activity", "s22"], ["⚙️", "Settings", "s20"]];
   return (
     <div style={{ display: "flex", borderTop: "1px solid " + C.border, background: C.white }}>
       {items.map(function (item) {
@@ -194,67 +220,142 @@ function WaveBars({ count, maxH, active, color, frame }) {
 
 /* ===== SCREENS ===== */
 
-function S1({ go }) {
+function HandArt({ style }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple, padding: "20px 28px 32px" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button onClick={() => go("s2")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 14, color: C.black, opacity: 0.7, textDecoration: "underline" }}>Login</button>
+    <svg viewBox="0 0 320 200" style={{ width: "100%", ...style }}>
+      <g stroke={C.black} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M80 160 C70 130, 50 110, 40 80 C35 65, 45 55, 55 65 C60 70, 65 80, 70 95" />
+        <path d="M70 95 C65 75, 55 55, 50 40 C45 25, 60 20, 65 35 C70 50, 75 70, 80 90" />
+        <path d="M80 90 C78 65, 75 45, 72 30 C70 15, 85 12, 87 28 C90 45, 90 65, 90 85" />
+        <path d="M90 85 C92 65, 95 50, 97 38 C100 25, 112 28, 110 42 C108 55, 102 75, 100 90" />
+        <path d="M100 90 C105 80, 115 70, 120 65 C128 58, 132 68, 125 76 C118 85, 108 95, 105 105" />
+        <path d="M80 160 C85 140, 95 120, 105 105" />
+        <path d="M65 160 C60 155, 55 150, 80 160" />
+        <path d="M220 160 C230 130, 250 110, 260 80 C265 65, 255 55, 245 65 C240 70, 235 80, 230 95" />
+        <path d="M230 95 C235 75, 245 55, 250 40 C255 25, 240 20, 235 35 C230 50, 225 70, 220 90" />
+        <path d="M220 90 C222 65, 225 45, 228 30 C230 15, 215 12, 213 28 C210 45, 210 65, 210 85" />
+        <path d="M210 85 C208 65, 205 50, 203 38 C200 25, 188 28, 190 42 C192 55, 198 75, 200 90" />
+        <path d="M200 90 C195 80, 185 70, 180 65 C172 58, 168 68, 175 76 C182 85, 192 95, 195 105" />
+        <path d="M220 160 C215 140, 205 120, 195 105" />
+        <path d="M235 160 C240 155, 245 150, 220 160" />
+        <path d="M125 76 C140 90, 155 95, 175 76" opacity="0.4" strokeDasharray="4 4" />
+      </g>
+    </svg>
+  );
+}
+
+function S1({ go }) {
+  const [slide, setSlide] = useState(0);
+  var slides = [
+    "Ennie is an app by world-renowned energy healer Charlie Goldsmith.",
+    "Connect to a test energy healer, 100% remotely and anonymously.",
+    "Rate your symptoms in real time during your session.",
+  ];
+  var next = useCallback(() => { setSlide((s) => (s + 1) % slides.length); haptic(); }, []);
+  var prev = useCallback(() => { setSlide((s) => (s - 1 + slides.length) % slides.length); haptic(); }, []);
+  var swipe = useSwipe(next, prev);
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+      <Hdr onBack={() => {}} />
+      <div style={{ padding: "0 24px", marginBottom: 8 }}>
+        <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: "0 0 4px", opacity: 0.7, fontFamily: ff }}>Suffering from pain?</p>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: C.black, lineHeight: 1.15, margin: 0, fontFamily: ff }}>Your energy healing journey begins here</h1>
       </div>
-      <div style={{ marginBottom: "auto" }}>
-        <h1 style={{ fontSize: 44, fontWeight: 900, color: C.black, lineHeight: 1.02, margin: "0 0 10px", fontFamily: ff }}>Welcome<br />to ENNIE</h1>
-        <p style={{ color: C.black, fontSize: 17, margin: 0, opacity: 0.6 }}>Energy healing for anyone, anywhere.</p>
-      </div>
-      <div style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
-        <div style={{ width: 180, height: 180, borderRadius: 999, background: C.pl, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: 72, opacity: 0.4 }}>🤲</span>
+      <div style={{ flex: 1, padding: "12px 24px", display: "flex", flexDirection: "column" }}>
+        <div {...swipe} style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.pd, boxShadow: "0 4px 24px rgba(100,80,200,0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
+            <button onClick={prev} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
+            <div style={{ background: C.black, borderRadius: 999, padding: "6px 14px", display: "flex", gap: 8 }}>
+              {slides.map((_, i) => (
+                <div key={i} style={{ width: i === slide ? 20 : 8, height: 8, borderRadius: 999, background: i === slide ? C.white : "rgba(255,255,255,0.3)", transition: "all 0.3s" }} />
+              ))}
+            </div>
+            <button onClick={next} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
+          </div>
+          <p style={{ fontSize: 18, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.5, margin: "0 0 16px", fontFamily: ff, minHeight: 54 }}>{slides[slide]}</p>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <HandArt />
+          </div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div onClick={() => go("s2")} style={{ background: C.pl, borderRadius: 24, padding: "28px 24px", cursor: "pointer", position: "relative" }}>
-          <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Suffering<br />from pain?</h2>
-          <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>Get started for FREE</p>
-          <span style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", fontSize: 24, color: C.black }}>→</span>
-        </div>
-        <Btn primary={false} onClick={() => go("s12")}>Join as a Test Energy Healer</Btn>
+      <div style={{ padding: "12px 24px 32px", display: "flex", gap: 12 }}>
+        <Btn onClick={() => go("s2")} style={{ flex: 1 }}>Join waitlist</Btn>
+        <Btn primary={false} onClick={() => go("sLogin")} style={{ flex: 1 }}>Log in</Btn>
       </div>
     </div>
   );
 }
 
-function S2({ go }) {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+function SelField({ label, value, onChange, options, style }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr onBack={() => go("s1")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
-        <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          {!sent ? (
-            <>
-              <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, textAlign: "center", margin: "0 0 24px", fontFamily: ff }}>Create your account</h2>
-              <Inp value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" style={{ marginBottom: 12 }} />
-              <Btn onClick={() => email && setSent(true)}>Send magic link</Btn>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
-                <div style={{ flex: 1, height: 1, background: C.border }} />
-                <span style={{ color: C.muted, fontSize: 13 }}>or</span>
-                <div style={{ flex: 1, height: 1, background: C.border }} />
-              </div>
-              <div style={{ display: "flex", gap: 10 }}>
-                <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Apple</Btn>
-                <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Google</Btn>
-              </div>
-            </>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-              <div style={{ width: 80, height: 80, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 40 }}>✉️</span>
-              </div>
-              <h3 style={{ color: C.black, fontWeight: 800, fontSize: 22, fontFamily: ff }}>Check your email</h3>
-              <p style={{ color: C.muted, fontSize: 15, textAlign: "center" }}>Magic link sent to<br /><strong style={{ color: C.black }}>{email}</strong></p>
-              <Btn onClick={() => go("s3")}>Continue (demo)</Btn>
-            </div>
-          )}
-        </WCard>
+    <div style={{ width: "100%", ...style }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.black, marginBottom: 4, fontFamily: ff }}>{label}</label>
+      <select value={value} onChange={onChange} style={{ width: "100%", boxSizing: "border-box", background: "transparent", border: "none", borderBottom: "1.5px solid " + C.border, padding: "10px 0", color: value ? C.black : C.muted, fontSize: 15, fontFamily: ff, outline: "none", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 4px center" }}>
+        <option value="">Select</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function Chk({ checked, onChange, children }) {
+  return (
+    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: C.black, fontFamily: ff }}>
+      <div onClick={(e) => { e.preventDefault(); onChange(!checked); }} style={{ width: 20, height: 20, borderRadius: 4, border: "1.5px solid " + C.border, background: checked ? C.black : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+        {checked && <span style={{ color: C.white, fontSize: 12, fontWeight: 700 }}>✓</span>}
+      </div>
+      <span>{children}</span>
+    </label>
+  );
+}
+
+function S2({ go }) {
+  const [form, setForm] = useState({ first: "", last: "", gender: "", dob: "", email: "", country: "" });
+  const [privacy, setPrivacy] = useState(false);
+  const [terms, setTerms] = useState(false);
+  var valid = form.first && form.last && form.email && privacy && terms;
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.purple, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s1")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <p style={{ color: C.black, fontSize: 13, margin: "0 0 2px", opacity: 0.7, fontFamily: ff }}>Let's get you set up</p>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Add your details</h2>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
+        <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female"]} style={{ marginBottom: 20 }} />
+        <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
+        <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+          <Chk checked={privacy} onChange={setPrivacy}>I agree to the <u>Privacy Policy</u></Chk>
+          <Chk checked={terms} onChange={setTerms}>I accept the <u>Terms and Conditions</u></Chk>
+        </div>
+        <Btn disabled={!valid} onClick={() => go("s3")}>Next</Btn>
+      </div>
+    </div>
+  );
+}
+
+function SLogin({ go }) {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.purple, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s1")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Log in to Ennie</h2>
+      </div>
+      <div style={{ flex: 1, padding: "32px 24px" }}>
+        <Inp label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter" style={{ marginBottom: 24 }} />
+        <Inp label="Password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Enter" style={{ marginBottom: 32 }} />
+        <Btn onClick={() => go("s21")}>Log in</Btn>
+        <p onClick={() => {}} style={{ color: C.black, fontSize: 14, textAlign: "center", marginTop: 20, cursor: "pointer", textDecoration: "underline", fontFamily: ff }}>Forgot password?</p>
       </div>
     </div>
   );
@@ -312,8 +413,9 @@ function S3({ go }) {
   );
 }
 
-function S4({ go }) {
-  const [msgs, setMsgs] = useState([{ from: "ai", text: "Hi, I'm Ennie. What's been going on with your body today?" }]);
+function S4({ go, setIntakeData }) {
+  const greeting = "Hi, I'm Ennie. Tell me, what's been going on with your body today?";
+  const [msgs, setMsgs] = useState([{ from: "ai", text: greeting }]);
   const [pins, setPins] = useState([]);
   const [input, setInput] = useState("");
   const [step, setStep] = useState(0);
@@ -321,37 +423,101 @@ function S4({ go }) {
   const [showMap, setShowMap] = useState(false);
   const [mode, setMode] = useState("voice");
   const sr = useRef(null);
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState("");
+  const listenerRef = useRef(null);
+  const intake = useRef({ area: "", duration: "", severity: "", description: "" });
 
-  const rep = ["Show me on the body map where you feel it.", "Got it. How long has this been going on?", "Set the severity — 0 to 10.", "Sounds like chronic pain. Does that feel right?", "You qualify for a free session."];
+  useEffect(() => { speak(greeting); return () => stopSpeaking(); }, []);
 
-  const send = (text) => {
+  function buildReply(step, userText) {
+    var l = userText.toLowerCase();
+    // Extract body part keywords
+    var parts = [];
+    ["neck", "back", "shoulder", "head", "knee", "leg", "arm", "wrist", "hip", "chest", "stomach", "ankle", "foot", "elbow"].forEach(function (p) { if (l.includes(p)) parts.push(p); });
+    var pain = l.includes("pain") || l.includes("sore") || l.includes("hurt") || l.includes("ache") || l.includes("stiff") || l.includes("tight");
+    var area = parts.length > 0 ? parts.join(" and ") : "";
+
+    if (step === 0) {
+      intake.current.area = area || "that area";
+      intake.current.description = userText;
+      if (area) {
+        return "I hear you — " + area + " pain. Can you show me on the body map exactly where you feel it?";
+      }
+      return "Got it. Can you show me on the body map where you feel it?";
+    }
+    if (step === 1) {
+      intake.current.duration = userText;
+      // Parse duration from response
+      if (l.includes("week")) return "So about " + userText.trim() + ". On a scale of 0 to 10, how bad is the " + intake.current.area + " right now?";
+      if (l.includes("month")) return userText.trim() + " — that's been a while. On a scale of 0 to 10, how severe is it right now?";
+      if (l.includes("day")) return "Just " + userText.trim() + ". On a scale of 0 to 10, how would you rate the pain right now?";
+      if (l.includes("year")) return userText.trim() + " — that's significant. On a scale of 0 to 10, how bad is it currently?";
+      return "Got it, " + userText.trim() + ". On a scale of 0 to 10, how severe is the " + intake.current.area + " pain right now?";
+    }
+    if (step === 2) {
+      intake.current.severity = userText.replace(/[^0-9]/g, "") || "7";
+      var sev = parseInt(intake.current.severity) || 7;
+      var sevWord = sev >= 7 ? "quite intense" : sev >= 4 ? "moderate" : "mild";
+      return "A " + sev + " out of 10 — that's " + sevWord + ". So you've had " + intake.current.area + " pain for " + intake.current.duration.trim() + " at a " + sev + ". Does that sound right?";
+    }
+    if (step === 3) {
+      if (setIntakeData) setIntakeData(intake.current);
+      return "Great. Based on what you've told me — " + intake.current.area + " pain, " + intake.current.duration.trim() + ", severity " + intake.current.severity + " — you qualify for a free energy healing session. Let's find you a healer.";
+    }
+    return "Thank you. Let's move on.";
+  }
+
+  const send = useCallback((text) => {
     const msg = text || input.trim();
     if (!msg) return;
     setMsgs((m) => [...m, { from: "user", text: msg }]);
     setInput("");
+    setInterim("");
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      setMsgs((m) => [...m, { from: "ai", text: rep[step] || "Thanks." }]);
+      var reply = buildReply(step, msg);
+      setMsgs((m) => [...m, { from: "ai", text: reply }]);
+      speak(reply);
       if (step === 0) setShowMap(true);
       setStep((s) => s + 1);
-    }, 800);
-  };
+    }, 1200);
+  }, [input, step]);
 
   const addPin = (pin) => {
     setPins((p) => [...p, pin]);
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      setMsgs((m) => [...m, { from: "ai", text: rep[Math.min(step + 1, rep.length - 1)] }]);
+      var reply = "Got it, I can see where you marked. How long has this been going on?";
+      if (step >= 1) reply = "Noted. How would you rate the pain from 0 to 10?";
+      setMsgs((m) => [...m, { from: "ai", text: reply }]);
+      speak(reply);
       setStep((s) => Math.max(s, 2));
     }, 600);
   };
 
-  const simV = () => {
-    var responses = ["My neck is really sore", "About two weeks", "Around a 7", "Yeah that sounds right", "OK let's do it"];
-    send(responses[step] || "Yes");
-  };
+  // Set up speech recognition
+  useEffect(() => {
+    if (!isSTTAvailable()) return;
+    var sendRef = send;
+    listenerRef.current = createListener(
+      (text) => { sendRef(text); },
+      (state) => { setListening(state.listening); setInterim(state.interim || ""); }
+    );
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [send]);
+
+  // Auto-start listening in voice mode
+  useEffect(() => {
+    if (mode === "voice" && listenerRef.current && step < 5) {
+      listenerRef.current.start();
+    } else if (mode !== "voice" && listenerRef.current) {
+      listenerRef.current.stop();
+    }
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [mode, step]);
 
   useEffect(() => {
     if (sr.current) sr.current.scrollTop = sr.current.scrollHeight;
@@ -363,10 +529,11 @@ function S4({ go }) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: C.white, borderRadius: "24px 24px 0 0", overflow: "hidden" }}>
         {mode === "voice" && !showMap && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, flex: 1 }}>
-            <p style={{ fontSize: 22, fontWeight: 700, color: C.black, marginBottom: 24, fontFamily: ff }}>Processing...</p>
-            <div style={{ width: 140, height: 140, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 24, opacity: 0.4 }}>🎙</span>
+            <p style={{ fontSize: 22, fontWeight: 700, color: C.black, marginBottom: 24, fontFamily: ff }}>{listening ? "Listening..." : "Starting mic..."}</p>
+            <div style={{ width: 140, height: 140, borderRadius: 999, background: listening ? C.pp : C.border, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s", animation: listening ? "pulse 2s infinite" : "none" }}>
+              <span style={{ fontSize: 24, opacity: listening ? 1 : 0.4 }}>🎙</span>
             </div>
+            {interim && <p style={{ color: C.muted, fontSize: 14, marginTop: 16, fontStyle: "italic", fontFamily: ff }}>{interim}</p>}
           </div>
         )}
         <div style={{ display: "flex", justifyContent: "center", padding: "8px 0" }}>
@@ -386,16 +553,27 @@ function S4({ go }) {
         </div>
         <div style={{ padding: "10px 16px 20px", borderTop: "1px solid " + C.border, display: "flex", gap: 8 }}>
           {mode === "text" ? (
-            <>
-              <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Type your response..." style={{ flex: 1, fontSize: 14, padding: "12px 14px" }} />
-              <button onClick={() => send()} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", flexShrink: 0 }}>
-                <span style={{ color: C.white, fontSize: 16 }}>↑</span>
-              </button>
-            </>
+            step >= 5 ? (
+              <Btn onClick={() => go("s6")} style={{ fontSize: 14 }}>Continue →</Btn>
+            ) : (
+              <>
+                <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Type your response..." style={{ flex: 1, fontSize: 14, padding: "12px 14px" }} />
+                <button onClick={() => send()} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer", flexShrink: 0 }}>
+                  <span style={{ color: C.white, fontSize: 16 }}>↑</span>
+                </button>
+              </>
+            )
           ) : (
-            <Btn onClick={() => { if (step >= 5) go("s6"); else simV(); }} style={{ fontSize: 14 }}>
-              {step >= 5 ? "Continue →" : "Tap to simulate voice"}
-            </Btn>
+            step >= 5 ? (
+              <Btn onClick={() => go("s6")} style={{ fontSize: 14 }}>Continue →</Btn>
+            ) : (
+              <div style={{ flex: 1, padding: 14, borderRadius: 14, border: "1.5px solid " + (listening ? C.green : C.border), textAlign: "center", background: listening ? C.green + "11" : "transparent", transition: "all 0.3s" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: 999, background: listening ? C.green : C.light, animation: listening ? "pulse 1.5s infinite" : "none" }} />
+                  <span style={{ color: listening ? C.green : C.muted, fontSize: 13, fontWeight: 600 }}>{listening ? (interim || "Speak now...") : "Starting mic..."}</span>
+                </div>
+              </div>
+            )
           )}
         </div>
       </div>
@@ -523,7 +701,12 @@ function S8({ go }) {
   );
 }
 
-function S9({ go }) {
+function S9({ go, intakeData }) {
+  var area = (intakeData && intakeData.area) || "neck";
+  var sev = (intakeData && intakeData.severity) || "7";
+  var dur = (intakeData && intakeData.duration) || "a while";
+  var greet = "Hi, I can see you've been dealing with " + area + " pain at a " + sev + " out of 10 for " + dur + ". I'm going to start working on that now. Can you tell me — is the pain more on the left or right side?";
+
   const TOTAL = 300;
   const [sec, setSec] = useState(TOTAL);
   const [mode, setMode] = useState("voice");
@@ -533,10 +716,21 @@ function S9({ go }) {
   const sr = useRef(null);
   const [wf, setWf] = useState(0);
   const [pins, setPins] = useState([{ x: 47, y: 22, side: "front", score: 7, label: "Neck" }, { x: 55, y: 38, side: "front", score: 5, label: "Back" }]);
-  const [msgs, setMsgs] = useState([{ from: "system", text: "Round 1 · Session started" }, { from: "healer", text: "Hi. Neck at 7, back at 5. Is the neck pain more left or right?" }]);
-  const [lastH, setLastH] = useState("Is the neck pain more left or right?");
+  const [msgs, setMsgs] = useState([{ from: "system", text: "Round 1 · Session started" }, { from: "healer", text: greet }]);
+  const [lastH, setLastH] = useState(greet);
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState("");
+  const listenerRef = useRef(null);
+  const userReplies = useRef(0);
 
-  var fups = [{ at: 260, text: "Sharp or dull ache?" }, { at: 220, text: "When did it start?" }, { at: 180, text: "Working on it now. Let me know if anything shifts." }, { at: 130, text: "How's the neck now vs when we started?" }];
+  useEffect(() => { speak(greet); return () => stopSpeaking(); }, []);
+
+  var fups = [
+    { at: 260, text: "Is it a sharp pain or more of a dull ache in your " + area + "?" },
+    { at: 220, text: "OK, I'm focusing on that area now. Just relax and let me know if you feel anything shift." },
+    { at: 180, text: "I'm working on the " + area + " right now. How's it feeling compared to when we started?" },
+    { at: 130, text: "We're making progress. What would you rate the " + area + " pain at now, out of 10?" },
+  ];
 
   useEffect(() => {
     if (sec <= 0) { go("s10"); return; }
@@ -550,6 +744,7 @@ function S9({ go }) {
       setSp("healer");
       setLastH(fu.text);
       setMsgs((m) => [...m, { from: "healer", text: fu.text }]);
+      speak(fu.text);
       setTimeout(() => setSp("idle"), 2500);
     }
   }, [sec]);
@@ -562,6 +757,72 @@ function S9({ go }) {
     const t = setInterval(() => setWf((x) => x + 1), 150);
     return () => clearInterval(t);
   }, []);
+
+  function buildHealerReply(text) {
+    var l = text.toLowerCase();
+    if (l.includes("right")) return "OK, right side. I'm directing energy to the right side of your " + area + " now. Let me know when you feel something.";
+    if (l.includes("left")) return "Got it, left side. Focusing on the left " + area + " area. Take a deep breath and tell me if anything changes.";
+    if (l.includes("sharp")) return "Sharp pain — that helps me focus. I'm going to work specifically on easing that sharpness. Just breathe.";
+    if (l.includes("dull") || l.includes("ache")) return "A dull ache — often that responds well to energy work. I'm easing into it now. Let me know how it feels.";
+    if (l.includes("tingle") || l.includes("warm") || l.includes("heat")) return "That's a great sign — warmth and tingling often mean the energy is flowing. I'll keep going.";
+    if (l.includes("same") || l.includes("no change")) return "That's OK, sometimes it takes a moment. I'm adjusting my approach. Stay relaxed.";
+    if (l.match(/\b[0-9]\b/) || l.match(/\b10\b/)) return "Thank you for the update. I'm continuing to work on bringing that down. Stay with it.";
+    if (l.includes("yes") || l.includes("yeah") || l.includes("ok")) return "Great, let's keep going. I'm still focused on your " + area + ". Tell me if anything shifts.";
+    return "Thank you for sharing that. I'm still working on the " + area + " area. Let me know how you're feeling.";
+  }
+
+  // Speech recognition for voice mode
+  const sendVoice = useCallback((text) => {
+    if (!text) return;
+    userReplies.current++;
+    setMsgs((m) => [...m, { from: "user", text }]);
+    setInterim("");
+    setSp("user");
+    var l = text.toLowerCase();
+    var improved = l.includes("better") || l.includes("lighter") || l.includes("eased") || l.includes("shifted") || l.includes("change") || l.includes("less");
+
+    if (improved) {
+      setSec(TOTAL);
+      setRound((r) => r + 1);
+      setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) })));
+      setTimeout(() => {
+        setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Timer reset" }]);
+        setTimeout(() => {
+          var t = "Good — I can feel that shift too. The " + area + " is responding. I'll keep working on it.";
+          setSp("healer");
+          setLastH(t);
+          setMsgs((m) => [...m, { from: "healer", text: t }]);
+          speak(t);
+          setTimeout(() => setSp("idle"), 3000);
+        }, 500);
+      }, 400);
+    } else {
+      // Reply contextually based on what user said
+      setTimeout(() => {
+        var reply = buildHealerReply(text);
+        setSp("healer");
+        setLastH(reply);
+        setMsgs((m) => [...m, { from: "healer", text: reply }]);
+        speak(reply);
+        setTimeout(() => setSp("idle"), 3000);
+      }, 1500);
+    }
+  }, [round, area]);
+
+  useEffect(() => {
+    if (!isSTTAvailable()) return;
+    listenerRef.current = createListener(
+      (text) => { sendVoice(text); },
+      (state) => { setListening(state.listening); setInterim(state.interim || ""); }
+    );
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [sendVoice]);
+
+  useEffect(() => {
+    if (mode === "voice" && listenerRef.current) listenerRef.current.start();
+    else if (listenerRef.current) listenerRef.current.stop();
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [mode]);
 
   const send = (text) => {
     var msg = text || input.trim();
@@ -581,6 +842,7 @@ function S9({ go }) {
           setSp("healer");
           setLastH(t);
           setMsgs((m) => [...m, { from: "healer", text: t }]);
+          speak(t);
           setTimeout(() => setSp("idle"), 2000);
         }, 500);
       }, 400);
@@ -625,23 +887,24 @@ function S9({ go }) {
               </div>
             </div>
             <div style={{ padding: "16px 20px", borderTop: "1px solid " + C.border, background: C.pp + "44" }}>
-              <WaveBars count={24} maxH={24} active={sp !== "idle"} color={sp === "healer" ? C.pd : C.green} frame={wf} />
+              <WaveBars count={24} maxH={24} active={sp !== "idle" || listening} color={sp === "healer" ? C.pd : C.green} frame={wf} />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8 }}>
-                <div style={{ width: 8, height: 8, borderRadius: 999, background: sp !== "idle" ? C.green : C.light }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: sp === "healer" ? C.pd : sp === "user" ? C.green : C.muted }}>
-                  {sp === "healer" ? "Healer speaking" : sp === "user" ? "You" : "Live — speak anytime"}
+                <div style={{ width: 8, height: 8, borderRadius: 999, background: (sp !== "idle" || listening) ? C.green : C.light }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: sp === "healer" ? C.pd : sp === "user" ? C.green : listening ? C.green : C.muted }}>
+                  {sp === "healer" ? "Healer speaking" : sp === "user" ? "You" : listening ? "Listening — speak anytime" : "Live — speak anytime"}
                 </span>
               </div>
               {sp === "healer" && <p style={{ color: C.muted, fontSize: 13, textAlign: "center", margin: "6px 0 0", fontStyle: "italic" }}>"{lastH}"</p>}
+              {interim && sp === "idle" && <p style={{ color: C.green, fontSize: 13, textAlign: "center", margin: "6px 0 0", fontStyle: "italic" }}>"{interim}"</p>}
             </div>
             <div style={{ padding: "10px 16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
-              <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 15, color: C.white }}>I feel a change</button>
+              <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); speak("Good — I felt that. Continuing."); }} style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 15, color: C.white }}>I feel a change</button>
               <div style={{ display: "flex", gap: 8 }}>
-                <div onClick={simV} style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + C.border, textAlign: "center", cursor: "pointer" }}>
-                  <span style={{ color: C.muted, fontSize: 13 }}>Simulate voice</span>
+                <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + (listening ? C.green : C.border), textAlign: "center", background: listening ? C.green + "11" : "transparent" }}>
+                  <span style={{ color: listening ? C.green : C.muted, fontSize: 13 }}>{listening ? "Mic active" : "Mic off"}</span>
                 </div>
                 <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
-                <button style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
+                <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
               </div>
             </div>
           </>
@@ -676,7 +939,7 @@ function S9({ go }) {
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ flex: 1, padding: "10px 14px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.white }}>I feel a change</button>
                 <button onClick={() => go("s10")} style={{ padding: "0 14px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 12, color: C.black }}>End</button>
-                <button style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
+                <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
               </div>
             </div>
           </>
@@ -746,54 +1009,112 @@ function S10({ go }) {
 }
 
 function S12({ go }) {
-  const [step, setStep] = useState(0);
+  const [slide, setSlide] = useState(0);
+  var slides = [
+    "Are you ready to transform lives for the better?",
+    "Ennie makes energy healing accessible to anyone, anywhere.",
+    "We securely connect test energy healers and users, protecting your data and privacy and conducting testing to ensure our test energy healers remain effective based on user feedback.",
+  ];
+  var next = useCallback(() => { setSlide((s) => (s + 1) % slides.length); haptic(); }, []);
+  var prev = useCallback(() => { setSlide((s) => (s - 1 + slides.length) % slides.length); haptic(); }, []);
+  var swipe = useSwipe(next, prev);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr title="Become a test healer" onBack={() => step > 0 ? setStep((s) => s - 1) : go("s1")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
-        <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-          <p style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>Step {step + 1} of 3</p>
-          {step === 0 && (
-            <>
-              <Inp placeholder="Language" style={{ marginBottom: 10 }} />
-              <Inp placeholder="Healing modality" style={{ marginBottom: 10 }} />
-              <Inp placeholder="Timezone" />
-            </>
-          )}
-          {step === 1 && (
-            <>
-              <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 16px" }}>Do you have experience?</h3>
-              <Btn onClick={() => setStep(2)} style={{ marginBottom: 10 }}>Yes</Btn>
-              <Btn primary={false} onClick={() => setStep(2)}>No — show me training</Btn>
-            </>
-          )}
-          {step === 2 && (
-            <>
-              <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 12px" }}>Platform rules</h3>
-              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>Sessions are AI-mediated and anonymous. No recordings.</p>
-              <Btn onClick={() => go("s13")}>I accept — join healer pool</Btn>
-            </>
-          )}
-          <div style={{ marginTop: "auto", display: "flex", justifyContent: "center", gap: 8, paddingTop: 16 }}>
-            {[0, 1, 2].map((i) => (
-              <div key={i} style={{ width: i === step ? 20 : 8, height: 8, borderRadius: 999, background: i === step ? C.black : C.border, transition: "all 0.3s" }} />
-            ))}
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
+      <Hdr onBack={() => go("s1")} />
+      <div style={{ padding: "0 24px", marginBottom: 8 }}>
+        <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: "0 0 4px", opacity: 0.7, fontFamily: ff }}>For test energy healers</p>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: C.black, lineHeight: 1.15, margin: 0, fontFamily: ff }}>Energy healing begins here</h1>
+      </div>
+      <div style={{ flex: 1, padding: "12px 24px", display: "flex", flexDirection: "column" }}>
+        <div {...swipe} style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.yd, boxShadow: "0 4px 24px rgba(200,180,40,0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
+            <button onClick={prev} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
+            <div style={{ background: C.black, borderRadius: 999, padding: "6px 14px", display: "flex", gap: 8 }}>
+              {slides.map((_, i) => (
+                <div key={i} style={{ width: i === slide ? 20 : 8, height: 8, borderRadius: 999, background: i === slide ? C.white : "rgba(255,255,255,0.3)", transition: "all 0.3s" }} />
+              ))}
+            </div>
+            <button onClick={next} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
           </div>
-        </WCard>
+          <p style={{ fontSize: 16, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.5, margin: "0 0 16px", fontFamily: ff, minHeight: 54 }}>{slides[slide]}</p>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <HandArt />
+          </div>
+        </div>
+      </div>
+      <div style={{ padding: "12px 24px 32px", display: "flex", gap: 12 }}>
+        <Btn onClick={() => go("sHReg")} style={{ flex: 1 }}>Join waitlist</Btn>
+        <Btn primary={false} onClick={() => go("sHLogin")} style={{ flex: 1 }}>Log in</Btn>
       </div>
     </div>
   );
+}
+
+function SHReg({ go }) {
+  const [form, setForm] = useState({ first: "", last: "", gender: "", dob: "", email: "", country: "" });
+  const [privacy, setPrivacy] = useState(false);
+  const [terms, setTerms] = useState(false);
+  var valid = form.first && form.last && form.email && privacy && terms;
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.yellow, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s12")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <p style={{ color: C.black, fontSize: 13, margin: "0 0 2px", opacity: 0.7, fontFamily: ff }}>Let's get you set up</p>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Add your details</h2>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
+        <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female"]} style={{ marginBottom: 20 }} />
+        <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
+        <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+          <Chk checked={privacy} onChange={setPrivacy}>I agree to the <u>Privacy Policy</u></Chk>
+          <Chk checked={terms} onChange={setTerms}>I accept the <u>Terms and Conditions</u></Chk>
+        </div>
+        <Btn disabled={!valid} onClick={() => go("s13")}>Next</Btn>
+      </div>
+    </div>
+  );
+}
+
+function SHLogin({ go }) {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.yellow, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s12")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Log in to Ennie</h2>
+      </div>
+      <div style={{ flex: 1, padding: "32px 24px" }}>
+        <Inp label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter" style={{ marginBottom: 24 }} />
+        <Inp label="Password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Enter" style={{ marginBottom: 32 }} />
+        <Btn onClick={() => go("s13")}>Log in</Btn>
+        <p onClick={() => {}} style={{ color: C.black, fontSize: 14, textAlign: "center", marginTop: 20, cursor: "pointer", textDecoration: "underline", fontFamily: ff }}>Forgot password?</p>
+      </div>
+    </div>
+  );
+}
+
+function HTag({ children }) {
+  return <span style={{ fontSize: 11, background: C.yp, color: C.yd, borderRadius: 999, padding: "4px 12px", fontWeight: 600 }}>{children}</span>;
 }
 
 function S13({ go }) {
   const [on, setOn] = useState(false);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.purple, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
+      <div style={{ background: C.yellow, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.black, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: ff }}>Healer dashboard</h2>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px 32px" }}>
-        <div style={{ background: on ? C.pp : C.white, border: "1.5px solid " + (on ? C.pd : C.border), borderRadius: 20, padding: 20, marginBottom: 14 }}>
+        <div style={{ background: on ? C.yp : C.white, border: "1.5px solid " + (on ? C.yd : C.border), borderRadius: 20, padding: 20, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <p style={{ fontWeight: 700, margin: 0, fontSize: 15 }}>{on ? "You're online" : "You're offline"}</p>
@@ -805,25 +1126,25 @@ function S13({ go }) {
           </div>
           {on && <Btn onClick={() => go("s14")} style={{ marginTop: 14, fontSize: 14 }}>Simulate incoming case →</Btn>}
         </div>
-        <div style={{ background: C.pp, borderRadius: 20, padding: 16, marginBottom: 14 }}>
+        <div style={{ background: C.yp, borderRadius: 20, padding: 16, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
             <span style={{ fontWeight: 700, fontSize: 14 }}>Qualification</span>
-            <Tag>Active</Tag>
+            <HTag>Active</HTag>
           </div>
           <div style={{ height: 6, background: C.white, borderRadius: 999, marginBottom: 4 }}>
-            <div style={{ height: "100%", width: "60%", background: C.pd, borderRadius: 999 }} />
+            <div style={{ height: "100%", width: "60%", background: C.yd, borderRadius: 999 }} />
           </div>
           <p style={{ color: C.muted, fontSize: 12, margin: 0 }}>18 of 30 sessions</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {[["18", "Sessions"], ["72%", "Change rate"], ["3.1", "Avg"]].map(([v, l], i) => (
             <div key={i} style={{ background: C.white, border: "1px solid " + C.border, borderRadius: 16, padding: 14, textAlign: "center" }}>
-              <p style={{ fontWeight: 900, fontSize: 20, margin: 0, color: C.pd }}>{v}</p>
+              <p style={{ fontWeight: 900, fontSize: 20, margin: 0, color: C.yd }}>{v}</p>
               <p style={{ fontSize: 11, color: C.muted, margin: "2px 0 0" }}>{l}</p>
             </div>
           ))}
         </div>
-        <Btn primary={false} onClick={() => go("s1")} style={{ marginTop: 14, fontSize: 13 }}>← Back</Btn>
+        <Btn primary={false} onClick={() => go("s12")} style={{ marginTop: 14, fontSize: 13 }}>← Back</Btn>
       </div>
     </div>
   );
@@ -837,8 +1158,8 @@ function S14({ go }) {
     return () => clearTimeout(t);
   }, [countdown]);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <div style={{ padding: "8px 20px" }}><Tag>Healer view</Tag></div>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
+      <div style={{ padding: "8px 20px" }}><HTag>Healer view</HTag></div>
       <div style={{ flex: 1, padding: "0 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Incoming case</h2>
@@ -846,13 +1167,13 @@ function S14({ go }) {
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
             <BMap pins={[{ x: 47, y: 22, side: "front", score: 7 }, { x: 55, y: 38, side: "front", score: 5 }]} readonly small />
             <div style={{ flex: 1 }}>
-              <div style={{ background: C.pp, borderRadius: 12, padding: 12, marginBottom: 8 }}>
+              <div style={{ background: C.yp, borderRadius: 12, padding: 12, marginBottom: 8 }}>
                 <p style={{ color: C.muted, fontSize: 11, margin: "0 0 2px", fontWeight: 600, textTransform: "uppercase" }}>Category</p>
                 <p style={{ color: C.black, fontWeight: 700, fontSize: 15, margin: 0 }}>Chronic pain</p>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 {[["Neck", 7], ["Back", 5]].map(([label, score]) => (
-                  <div key={label} style={{ background: C.pp, borderRadius: 10, padding: "6px 12px", flex: 1 }}>
+                  <div key={label} style={{ background: C.yp, borderRadius: 10, padding: "6px 12px", flex: 1 }}>
                     <p style={{ color: C.muted, fontSize: 11, margin: 0 }}>{label}</p>
                     <p style={{ color: C.black, fontWeight: 800, fontSize: 18, margin: 0 }}>{score}<span style={{ fontSize: 12, color: C.muted }}>/10</span></p>
                   </div>
@@ -860,14 +1181,15 @@ function S14({ go }) {
               </div>
             </div>
           </div>
-          <div style={{ background: C.pp, borderRadius: 14, padding: 14 }}>
+          <div style={{ background: C.yp, borderRadius: 14, padding: 14 }}>
             <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", margin: "0 0 4px" }}>AI summary</p>
             <p style={{ color: C.black, fontSize: 14, lineHeight: 1.5, margin: 0 }}>Case reports chronic neck and back pain for approximately 2 weeks. Neck is primary concern, rated 7/10. Described as dull ache on right side.</p>
           </div>
           <div style={{ marginTop: "auto", paddingTop: 16 }}>
-            <div style={{ height: 6, background: C.border, borderRadius: 999 }}>
-              <div style={{ height: "100%", background: C.pd, borderRadius: 999, width: ((10 - countdown) / 10 * 100) + "%", transition: "width 1s linear" }} />
+            <div style={{ height: 6, background: C.border, borderRadius: 999, marginBottom: 14 }}>
+              <div style={{ height: "100%", background: C.yd, borderRadius: 999, width: ((10 - countdown) / 10 * 100) + "%", transition: "width 1s linear" }} />
             </div>
+            <Btn onClick={() => go("s15")}>Start session now</Btn>
           </div>
         </WCard>
       </div>
@@ -878,9 +1200,17 @@ function S14({ go }) {
 function S15({ go }) {
   const TOTAL = 300;
   const [sec, setSec] = useState(TOTAL);
-  const [msgs, setMsgs] = useState([{ from: "system", text: "Case matched" }, { from: "healer", text: "Neck 7, back 5. 2 weeks. Starting." }]);
+  const [mode, setMode] = useState("voice");
+  const [msgs, setMsgs] = useState([{ from: "system", text: "Case matched · Round 1" }, { from: "system", text: "Case: Neck 7/10, Back 5/10 — chronic pain, 2 weeks" }]);
   const [input, setInput] = useState("");
+  const [pins, setPins] = useState([{ x: 47, y: 22, side: "front", score: 7, label: "Neck" }, { x: 55, y: 38, side: "front", score: 5, label: "Back" }]);
   const sr = useRef(null);
+  const [wf, setWf] = useState(0);
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState("");
+  const listenerRef = useRef(null);
+
+  useEffect(() => { return () => stopSpeaking(); }, []);
 
   useEffect(() => {
     if (sec <= 0) { go("s16"); return; }
@@ -892,43 +1222,105 @@ function S15({ go }) {
     if (sr.current) sr.current.scrollTop = sr.current.scrollHeight;
   }, [msgs]);
 
+  useEffect(() => {
+    const t = setInterval(() => setWf((x) => x + 1), 150);
+    return () => clearInterval(t);
+  }, []);
+
+  // Simulate case updates at certain times
+  useEffect(() => {
+    if (sec === 250) { setMsgs((m) => [...m, { from: "system", text: "Case reports: neck feels slightly lighter" }]); speak("Case reports: neck feels slightly lighter"); }
+    if (sec === 250) setPins((p) => p.map((pin) => pin.label === "Neck" ? { ...pin, score: 5 } : pin));
+    if (sec === 200) { setMsgs((m) => [...m, { from: "system", text: "Case tapped 'I feel a change'" }]); speak("Case tapped I feel a change"); }
+    if (sec === 200) setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 1) })));
+  }, [sec]);
+
+  const sendVoice = useCallback((text) => {
+    if (!text) return;
+    setMsgs((m) => [...m, { from: "user", text }]);
+    setInterim("");
+    setTimeout(() => setMsgs((m) => [...m, { from: "system", text: "Relayed to case via AI" }]), 500);
+  }, []);
+
+  useEffect(() => {
+    if (!isSTTAvailable()) return;
+    listenerRef.current = createListener(
+      (text) => { sendVoice(text); },
+      (state) => { setListening(state.listening); setInterim(state.interim || ""); }
+    );
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [sendVoice]);
+
+  useEffect(() => {
+    if (mode === "voice" && listenerRef.current) listenerRef.current.start();
+    else if (listenerRef.current) listenerRef.current.stop();
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [mode]);
+
   const send = () => {
     if (!input.trim()) return;
-    setMsgs((m) => [...m, { from: "user", text: "[To case]: " + input }]);
+    setMsgs((m) => [...m, { from: "user", text: input }]);
     setInput("");
-    setTimeout(() => setMsgs((m) => [...m, { from: "system", text: "Relayed" }]), 500);
+    setTimeout(() => setMsgs((m) => [...m, { from: "system", text: "Relayed to case via AI" }]), 500);
   };
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
       <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Tag>Healer view</Tag>
-        <CRing seconds={sec} total={TOTAL} size={48} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <HTag>Healer view</HTag>
+          <CRing seconds={sec} total={TOTAL} size={48} />
+        </div>
+        <div style={{ display: "flex", gap: 4 }}>
+          <Pill active={mode === "voice"} onClick={() => setMode("voice")} style={{ fontSize: 11, padding: "3px 10px" }}>Voice</Pill>
+          <Pill active={mode === "text"} onClick={() => setMode("text")} style={{ fontSize: 11, padding: "3px 10px" }}>Text</Pill>
+        </div>
       </div>
       <div style={{ flex: 1, background: C.white, borderRadius: "24px 24px 0 0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: 12, borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", gap: 10 }}>
-          <BMap pins={[{ x: 47, y: 22, side: "front", score: 7 }, { x: 55, y: 38, side: "front", score: 5 }]} readonly small />
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {[["Neck", 7], ["Back", 5]].map(([k, v]) => (
-              <div key={k} style={{ background: C.pp, borderRadius: 8, padding: "4px 10px" }}>
-                <span style={{ fontSize: 12 }}>{k}: <strong>{v}/10</strong></span>
+          <BMap pins={pins} readonly small />
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
+            {pins.map((p, i) => (
+              <div key={i} style={{ background: C.yp, borderRadius: 8, padding: "4px 10px" }}>
+                <span style={{ fontSize: 12 }}>{p.label}: <strong>{p.score}/10</strong></span>
               </div>
             ))}
           </div>
         </div>
-        <div ref={sr} style={{ flex: 1, overflowY: "auto", padding: "10px 14px" }}>
-          {msgs.map((m, i) => {
-            if (m.from === "system") {
-              return <div key={i} style={{ textAlign: "center", marginBottom: 8 }}><span style={{ color: C.muted, fontSize: 11, background: C.pp, padding: "2px 10px", borderRadius: 999 }}>{m.text}</span></div>;
-            }
-            return <Bubble key={i} from={m.from} text={m.text} />;
-          })}
-        </div>
+        {mode === "voice" ? (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }}>
+            <p style={{ color: C.yd, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{listening ? "Mic active — speak naturally" : "AI Audio — work eyes-closed"}</p>
+            <WaveBars count={20} maxH={20} active={listening} color={C.yd} frame={wf} />
+            {interim && <p style={{ color: C.yd, fontSize: 14, marginTop: 8, fontStyle: "italic" }}>"{interim}"</p>}
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 12, textAlign: "center", lineHeight: 1.5 }}>AI mediates between you and the case.<br />Speak naturally — your words are relayed.</p>
+          </div>
+        ) : (
+          <div ref={sr} style={{ flex: 1, overflowY: "auto", padding: "10px 14px" }}>
+            {msgs.map((m, i) => {
+              if (m.from === "system") {
+                return <div key={i} style={{ textAlign: "center", marginBottom: 8 }}><span style={{ color: C.muted, fontSize: 11, background: C.yp, padding: "2px 10px", borderRadius: 999 }}>{m.text}</span></div>;
+              }
+              return <Bubble key={i} from={m.from} text={m.text} />;
+            })}
+          </div>
+        )}
         <div style={{ padding: "10px 14px 20px", borderTop: "1px solid " + C.border, display: "flex", gap: 8 }}>
-          <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Ask case a question..." style={{ flex: 1, fontSize: 14, padding: 12 }} />
-          <button onClick={send} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: C.white }}>↑</span>
-          </button>
+          {mode === "text" ? (
+            <>
+              <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Message case via AI..." style={{ flex: 1, fontSize: 14, padding: 12 }} />
+              <button onClick={send} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ color: C.white }}>↑</span>
+              </button>
+            </>
+          ) : (
+            <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + (listening ? C.yd : C.border), textAlign: "center", background: listening ? C.yd + "22" : "transparent", transition: "all 0.3s" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: 999, background: listening ? C.yd : C.light }} />
+                <span style={{ color: listening ? C.yd : C.muted, fontSize: 13 }}>{listening ? (interim || "Speak to AI mediator...") : "Starting mic..."}</span>
+              </div>
+            </div>
+          )}
+          <button onClick={() => go("s16")} style={{ padding: "0 16px", height: 42, borderRadius: 14, background: C.yp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
         </div>
       </div>
     </div>
@@ -938,18 +1330,18 @@ function S15({ go }) {
 function S16({ go }) {
   const [ready, setReady] = useState(false);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <div style={{ padding: "8px 20px" }}><Tag>Healer view</Tag></div>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
+      <div style={{ padding: "8px 20px" }}><HTag>Healer view</HTag></div>
       <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
         <WCard>
-          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.yp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
             <span style={{ fontSize: 28 }}>✨</span>
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 6px", textAlign: "center", fontFamily: ff }}>Session complete</h2>
           <p style={{ color: C.muted, fontSize: 14, textAlign: "center", margin: "0 0 20px" }}>Here's how the case responded</p>
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
             {[["Neck", 7, 3], ["Back", 5, 2]].map(([label, before, after]) => (
-              <div key={label} style={{ flex: 1, background: C.pp, borderRadius: 14, padding: 14, textAlign: "center" }}>
+              <div key={label} style={{ flex: 1, background: C.yp, borderRadius: 14, padding: 14, textAlign: "center" }}>
                 <p style={{ color: C.muted, fontSize: 12, margin: "0 0 4px" }}>{label}</p>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
                   <span style={{ color: C.muted, fontSize: 16 }}>{before}</span>
@@ -962,7 +1354,7 @@ function S16({ go }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
             {[["19", "Sessions"], ["74%", "Change rate"], ["3.2", "Avg score"]].map(([v, l], i) => (
               <div key={i} style={{ background: C.white, border: "1px solid " + C.border, borderRadius: 14, padding: 12, textAlign: "center" }}>
-                <p style={{ fontWeight: 900, fontSize: 18, margin: 0, color: C.pd }}>{v}</p>
+                <p style={{ fontWeight: 900, fontSize: 18, margin: 0, color: C.yd }}>{v}</p>
                 <p style={{ fontSize: 10, color: C.muted, margin: "2px 0 0" }}>{l}</p>
               </div>
             ))}
@@ -1004,8 +1396,8 @@ function S18({ go }) {
       <div style={{ flex: 1, padding: "0 20px 32px" }}>
         <WCard>
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-            <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Apple Pay</Btn>
-            <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Google Pay</Btn>
+            <Btn primary={false} onClick={() => go("sq")} style={{ flex: 1, fontSize: 14 }}>Apple Pay</Btn>
+            <Btn primary={false} onClick={() => go("sq")} style={{ flex: 1, fontSize: 14 }}>Google Pay</Btn>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "12px 0" }}>
             <div style={{ flex: 1, height: 1, background: C.border }} />
@@ -1026,23 +1418,75 @@ function S18({ go }) {
 }
 
 function S20({ go }) {
+  const [values, setValues] = useState({ "Display name": "User", "Email": "user@example.com", "Language": "English", "Notifications": "On", "Payment methods": "None" });
+  const selStyle = { width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "12px 16px", color: C.black, fontSize: 14, fontFamily: ff, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" };
+  var settingsConfig = [
+    { key: "Display name", options: ["User", "Anonymous", "Custom"] },
+    { key: "Email", options: ["user@example.com", "Change email"] },
+    { key: "Language", options: ["English", "Spanish", "French", "Portuguese", "Mandarin"] },
+    { key: "Notifications", options: ["On", "Off", "Quiet hours only"] },
+    { key: "Payment methods", options: ["None", "Add card", "Apple Pay", "Google Pay"] },
+  ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
       <div style={{ background: C.purple, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.black, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: ff }}>Settings</h2>
       </div>
       <div style={{ flex: 1, padding: "16px 20px", overflowY: "auto" }}>
-        {["Display name", "Email", "Language", "Notifications", "Payment methods"].map((x) => (
-          <div key={x} style={{ padding: "16px 0", borderBottom: "1px solid " + C.border, display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 15, fontWeight: 500 }}>{x}</span>
-            <span style={{ color: C.muted }}>→</span>
+        {settingsConfig.map((item) => (
+          <div key={item.key} style={{ padding: "12px 0", borderBottom: "1px solid " + C.border }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: C.muted, margin: "0 0 6px" }}>{item.key}</p>
+            <select value={values[item.key]} onChange={(e) => setValues((v) => ({ ...v, [item.key]: e.target.value }))} style={selStyle}>
+              {item.options.map((o) => <option key={o} value={o}>{o}</option>)}
+            </select>
           </div>
         ))}
         <div style={{ padding: "16px 0", cursor: "pointer" }} onClick={() => go("s1")}>
           <span style={{ fontSize: 15, fontWeight: 500, color: C.red }}>Delete account</span>
         </div>
+        <Btn onClick={() => go("s21")} style={{ marginTop: 16 }}>Save & return home</Btn>
       </div>
       <TabBar go={go} active="Settings" />
+    </div>
+  );
+}
+
+function S22({ go }) {
+  var sessions = [
+    { date: "Today", time: "2:30 PM", healer: "Test Healer A7Q2", type: "Free", status: "Completed", areas: [["Neck", 7, 3], ["Back", 5, 2]] },
+    { date: "Yesterday", time: "11:00 AM", healer: "Test Healer B3K1", type: "Free", status: "Completed", areas: [["Shoulder", 6, 4]] },
+    { date: "Mar 9", time: "4:15 PM", healer: "Test Healer A7Q2", type: "Free", status: "Completed", areas: [["Neck", 8, 5], ["Back", 6, 3]] },
+  ];
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.purple, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
+        <h2 style={{ color: C.black, fontWeight: 800, fontSize: 22, margin: "0 0 4px", fontFamily: ff }}>Activity</h2>
+        <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>{sessions.length} sessions completed</p>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
+        {sessions.map((s, i) => (
+          <div key={i} style={{ background: C.bg, borderRadius: 16, padding: 16, marginBottom: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: C.black, fontFamily: ff }}>{s.date} · {s.time}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: C.green, background: C.green + "18", padding: "2px 10px", borderRadius: 999 }}>{s.status}</span>
+            </div>
+            <p style={{ fontSize: 13, color: C.muted, margin: "0 0 8px" }}>{s.healer} · {s.type}</p>
+            <div style={{ display: "flex", gap: 8 }}>
+              {s.areas.map(([label, before, after]) => (
+                <div key={label} style={{ background: C.white, borderRadius: 10, padding: "8px 12px", flex: 1 }}>
+                  <p style={{ color: C.muted, fontSize: 11, margin: "0 0 2px" }}>{label}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ color: C.muted, fontSize: 14 }}>{before}</span>
+                    <span style={{ color: C.light, fontSize: 10 }}>→</span>
+                    <span style={{ color: C.green, fontWeight: 800, fontSize: 16 }}>{after}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <TabBar go={go} active="Activity" />
     </div>
   );
 }
@@ -1088,6 +1532,7 @@ function S21({ go }) {
 /* ===== SCREEN MAP ===== */
 var SCREENS = {
   s1: { comp: S1, label: "1. Landing" },
+  sLogin: { comp: SLogin, label: "1b. Login" },
   s2: { comp: S2, label: "2. Sign Up" },
   s3: { comp: S3, label: "3. Age Gate & DOB" },
   s4: { comp: S4, label: "4. Intake" },
@@ -1097,8 +1542,10 @@ var SCREENS = {
   s8: { comp: S8, label: "8. Symptom Confirm" },
   s9: { comp: S9, label: "9. Live Session" },
   s10: { comp: S10, label: "10. Session End" },
-  s12: { comp: S12, label: "12. Healer Onboard" },
-  s13: { comp: S13, label: "13. Healer Home" },
+  s12: { comp: S12, label: "12. Healer Landing" },
+  sHReg: { comp: SHReg, label: "12b. Healer Sign Up" },
+  sHLogin: { comp: SHLogin, label: "12c. Healer Login" },
+  s13: { comp: S13, label: "13. Healer Dashboard" },
   s14: { comp: S14, label: "14. Match Notification" },
   s15: { comp: S15, label: "15. Healer Session" },
   s16: { comp: S16, label: "16. Healer Post-Session" },
@@ -1106,23 +1553,25 @@ var SCREENS = {
   s18: { comp: S18, label: "18. Payment" },
   s20: { comp: S20, label: "20. Settings" },
   s21: { comp: S21, label: "21. Home" },
+  s22: { comp: S22, label: "22. Activity" },
 };
 
 var GROUPS = [
-  { title: "Case Journey", keys: ["s1", "s2", "s3", "s4", "s6", "sq", "s7", "s8", "s9", "s10"] },
-  { title: "Healer", keys: ["s12", "s13", "s14", "s15", "s16"] },
-  { title: "Other", keys: ["s17", "s18", "s20", "s21"] },
+  { title: "Case Journey", keys: ["s1", "sLogin", "s2", "s3", "s4", "s6", "sq", "s7", "s8", "s9", "s10"] },
+  { title: "Healer", keys: ["s12", "sHReg", "sHLogin", "s13", "s14", "s15", "s16"] },
+  { title: "Other", keys: ["s17", "s18", "s20", "s21", "s22"] },
 ];
 
 export default function ENNIEv1_3() {
   const [screen, setScreen] = useState("s1");
   const [nav, setNav] = useState(false);
+  const [intakeData, setIntakeData] = useState({ area: "neck", duration: "two weeks", severity: "7", description: "" });
   var entry = SCREENS[screen] || SCREENS.s1;
   var Comp = entry.comp;
   var label = entry.label;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#F0ECF8", padding: 12, fontFamily: ff }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: C.bg, padding: 12, fontFamily: ff }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10, width: 390 }}>
         <span style={{ fontWeight: 800, fontSize: 14, color: C.pd }}>Ennie™</span>
         <span style={{ color: C.muted, fontSize: 12, flex: 1, textAlign: "center" }}>{label}</span>
@@ -1150,7 +1599,7 @@ export default function ENNIEv1_3() {
           </div>
         ) : (
           <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
-            <Comp go={setScreen} />
+            <Comp go={setScreen} intakeData={intakeData} setIntakeData={setIntakeData} />
           </div>
         )}
       </div>
