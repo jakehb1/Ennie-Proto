@@ -1,19 +1,24 @@
 import { useState, useEffect, useRef } from "react";
 
 const C = {
-  purple: "#B8A5E8",
-  pl: "#C9BDF0",
-  pp: "#DDD4F5",
-  pd: "#9B8AD4",
+  purple: "#816FE8",
+  pl: "#9B8ADE",
+  pp: "#C4B8F0",
+  pd: "#6B5BD4",
   white: "#FFFFFF",
   black: "#1A1A1A",
   muted: "#888888",
   light: "#aaaaaa",
-  border: "#E8E4F0",
+  border: "#E0DCE8",
   pink: "#F8D4DE",
   green: "#34C759",
   red: "#FF3B30",
   amber: "#FF9500",
+  bg: "#ECEDF7",
+  yellow: "#F5D547",
+  yl: "#FFDE59",
+  yp: "#FFF3C4",
+  yd: "#D4B52E",
 };
 
 const ff = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
@@ -24,13 +29,13 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
       disabled={disabled}
       onClick={onClick}
       style={{
-        width: "100%", padding: "16px 20px", borderRadius: 16,
-        fontWeight: 700, fontSize: 16, cursor: disabled ? "default" : "pointer",
+        width: "100%", padding: "16px 20px", borderRadius: 14,
+        fontWeight: 600, fontSize: 16, cursor: disabled ? "default" : "pointer",
         fontFamily: ff, opacity: disabled ? 0.35 : 1,
         background: primary ? C.black : C.white,
         color: primary ? C.white : C.black,
         border: primary ? "none" : "1.5px solid " + C.black,
-        boxShadow: "none", ...style,
+        boxShadow: "none", letterSpacing: 0.2, ...style,
       }}
     >
       {children}
@@ -38,18 +43,21 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
   );
 }
 
-function Inp({ value, onChange, placeholder, style, onKeyDown }) {
+function Inp({ value, onChange, placeholder, style, onKeyDown, label }) {
   return (
-    <input
-      value={value} onChange={onChange} onKeyDown={onKeyDown}
-      placeholder={placeholder}
-      style={{
-        width: "100%", boxSizing: "border-box", background: C.white,
-        border: "1.5px solid " + C.border, borderRadius: 14,
-        padding: "14px 16px", color: C.black, fontSize: 15,
-        outline: "none", fontFamily: ff, ...style,
-      }}
-    />
+    <div style={{ width: "100%", ...style }}>
+      {label && <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.black, marginBottom: 4, fontFamily: ff }}>{label}</label>}
+      <input
+        value={value} onChange={onChange} onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        style={{
+          width: "100%", boxSizing: "border-box", background: "transparent",
+          border: "none", borderBottom: "1.5px solid " + C.border,
+          padding: "10px 0", color: C.black, fontSize: 15,
+          outline: "none", fontFamily: ff,
+        }}
+      />
+    </div>
   );
 }
 
@@ -194,67 +202,139 @@ function WaveBars({ count, maxH, active, color, frame }) {
 
 /* ===== SCREENS ===== */
 
-function S1({ go }) {
+function HandArt({ style }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple, padding: "20px 28px 32px" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button onClick={() => go("s2")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 14, color: C.black, opacity: 0.7, textDecoration: "underline" }}>Login</button>
+    <svg viewBox="0 0 320 200" style={{ width: "100%", ...style }}>
+      <g stroke={C.black} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M80 160 C70 130, 50 110, 40 80 C35 65, 45 55, 55 65 C60 70, 65 80, 70 95" />
+        <path d="M70 95 C65 75, 55 55, 50 40 C45 25, 60 20, 65 35 C70 50, 75 70, 80 90" />
+        <path d="M80 90 C78 65, 75 45, 72 30 C70 15, 85 12, 87 28 C90 45, 90 65, 90 85" />
+        <path d="M90 85 C92 65, 95 50, 97 38 C100 25, 112 28, 110 42 C108 55, 102 75, 100 90" />
+        <path d="M100 90 C105 80, 115 70, 120 65 C128 58, 132 68, 125 76 C118 85, 108 95, 105 105" />
+        <path d="M80 160 C85 140, 95 120, 105 105" />
+        <path d="M65 160 C60 155, 55 150, 80 160" />
+        <path d="M220 160 C230 130, 250 110, 260 80 C265 65, 255 55, 245 65 C240 70, 235 80, 230 95" />
+        <path d="M230 95 C235 75, 245 55, 250 40 C255 25, 240 20, 235 35 C230 50, 225 70, 220 90" />
+        <path d="M220 90 C222 65, 225 45, 228 30 C230 15, 215 12, 213 28 C210 45, 210 65, 210 85" />
+        <path d="M210 85 C208 65, 205 50, 203 38 C200 25, 188 28, 190 42 C192 55, 198 75, 200 90" />
+        <path d="M200 90 C195 80, 185 70, 180 65 C172 58, 168 68, 175 76 C182 85, 192 95, 195 105" />
+        <path d="M220 160 C215 140, 205 120, 195 105" />
+        <path d="M235 160 C240 155, 245 150, 220 160" />
+        <path d="M125 76 C140 90, 155 95, 175 76" opacity="0.4" strokeDasharray="4 4" />
+      </g>
+    </svg>
+  );
+}
+
+function S1({ go }) {
+  const [slide, setSlide] = useState(0);
+  var slides = [
+    "Ennie is an app by world-renowned energy healer Charlie Goldsmith.",
+    "Connect to a test energy healer, 100% remotely and anonymously.",
+    "Rate your symptoms in real time during your session.",
+  ];
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+      <Hdr onBack={() => {}} />
+      <div style={{ padding: "0 24px", marginBottom: 8 }}>
+        <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: "0 0 4px", opacity: 0.7, fontFamily: ff }}>Suffering from pain?</p>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: C.black, lineHeight: 1.15, margin: 0, fontFamily: ff }}>Your energy healing journey begins here</h1>
       </div>
-      <div style={{ marginBottom: "auto" }}>
-        <h1 style={{ fontSize: 44, fontWeight: 900, color: C.black, lineHeight: 1.02, margin: "0 0 10px", fontFamily: ff }}>Welcome<br />to ENNIE</h1>
-        <p style={{ color: C.black, fontSize: 17, margin: 0, opacity: 0.6 }}>Energy healing for anyone, anywhere.</p>
-      </div>
-      <div style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
-        <div style={{ width: 180, height: 180, borderRadius: 999, background: C.pl, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: 72, opacity: 0.4 }}>🤲</span>
+      <div style={{ flex: 1, padding: "12px 24px", display: "flex", flexDirection: "column" }}>
+        <div style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.pd, boxShadow: "0 4px 24px rgba(100,80,200,0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
+            <button onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
+            <div style={{ background: C.black, borderRadius: 999, padding: "6px 14px", display: "flex", gap: 8 }}>
+              {slides.map((_, i) => (
+                <div key={i} style={{ width: i === slide ? 20 : 8, height: 8, borderRadius: 999, background: i === slide ? C.white : "rgba(255,255,255,0.3)", transition: "all 0.3s" }} />
+              ))}
+            </div>
+            <button onClick={() => setSlide((s) => (s + 1) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
+          </div>
+          <p style={{ fontSize: 18, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.5, margin: "0 0 16px", fontFamily: ff, minHeight: 54 }}>{slides[slide]}</p>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <HandArt />
+          </div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div onClick={() => go("s2")} style={{ background: C.pl, borderRadius: 24, padding: "28px 24px", cursor: "pointer", position: "relative" }}>
-          <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Suffering<br />from pain?</h2>
-          <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>Get started for FREE</p>
-          <span style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", fontSize: 24, color: C.black }}>→</span>
-        </div>
-        <Btn primary={false} onClick={() => go("s12")}>Join as a Test Energy Healer</Btn>
+      <div style={{ padding: "12px 24px 32px", display: "flex", gap: 12 }}>
+        <Btn onClick={() => go("s2")} style={{ flex: 1 }}>Join waitlist</Btn>
+        <Btn primary={false} onClick={() => go("sLogin")} style={{ flex: 1 }}>Log in</Btn>
       </div>
     </div>
   );
 }
 
-function S2({ go }) {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+function SelField({ label, value, onChange, options, style }) {
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr onBack={() => go("s1")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
-        <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          {!sent ? (
-            <>
-              <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, textAlign: "center", margin: "0 0 24px", fontFamily: ff }}>Create your account</h2>
-              <Inp value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" style={{ marginBottom: 12 }} />
-              <Btn onClick={() => email && setSent(true)}>Send magic link</Btn>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
-                <div style={{ flex: 1, height: 1, background: C.border }} />
-                <span style={{ color: C.muted, fontSize: 13 }}>or</span>
-                <div style={{ flex: 1, height: 1, background: C.border }} />
-              </div>
-              <div style={{ display: "flex", gap: 10 }}>
-                <Btn primary={false} onClick={() => go("s3")} style={{ flex: 1, fontSize: 14 }}>Apple</Btn>
-                <Btn primary={false} onClick={() => go("s3")} style={{ flex: 1, fontSize: 14 }}>Google</Btn>
-              </div>
-            </>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-              <div style={{ width: 80, height: 80, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 40 }}>✉️</span>
-              </div>
-              <h3 style={{ color: C.black, fontWeight: 800, fontSize: 22, fontFamily: ff }}>Check your email</h3>
-              <p style={{ color: C.muted, fontSize: 15, textAlign: "center" }}>Magic link sent to<br /><strong style={{ color: C.black }}>{email}</strong></p>
-              <Btn onClick={() => go("s3")}>Continue (demo)</Btn>
-            </div>
-          )}
-        </WCard>
+    <div style={{ width: "100%", ...style }}>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.black, marginBottom: 4, fontFamily: ff }}>{label}</label>
+      <select value={value} onChange={onChange} style={{ width: "100%", boxSizing: "border-box", background: "transparent", border: "none", borderBottom: "1.5px solid " + C.border, padding: "10px 0", color: value ? C.black : C.muted, fontSize: 15, fontFamily: ff, outline: "none", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 4px center" }}>
+        <option value="">Select</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function Chk({ checked, onChange, children }) {
+  return (
+    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: C.black, fontFamily: ff }}>
+      <div onClick={(e) => { e.preventDefault(); onChange(!checked); }} style={{ width: 20, height: 20, borderRadius: 4, border: "1.5px solid " + C.border, background: checked ? C.black : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+        {checked && <span style={{ color: C.white, fontSize: 12, fontWeight: 700 }}>✓</span>}
+      </div>
+      <span>{children}</span>
+    </label>
+  );
+}
+
+function S2({ go }) {
+  const [form, setForm] = useState({ first: "", last: "", gender: "", dob: "", email: "", country: "" });
+  const [privacy, setPrivacy] = useState(false);
+  const [terms, setTerms] = useState(false);
+  var valid = form.first && form.last && form.email && privacy && terms;
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.purple, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s1")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <p style={{ color: C.black, fontSize: 13, margin: "0 0 2px", opacity: 0.7, fontFamily: ff }}>Let's get you set up</p>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Add your details</h2>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
+        <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female", "Non-binary", "Prefer not to say"]} style={{ marginBottom: 20 }} />
+        <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
+        <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+          <Chk checked={privacy} onChange={setPrivacy}>I agree to the <u>Privacy Policy</u></Chk>
+          <Chk checked={terms} onChange={setTerms}>I accept the <u>Terms and Conditions</u></Chk>
+        </div>
+        <Btn disabled={!valid} onClick={() => go("s3")}>Next</Btn>
+      </div>
+    </div>
+  );
+}
+
+function SLogin({ go }) {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.purple, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s1")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Log in to Ennie</h2>
+      </div>
+      <div style={{ flex: 1, padding: "32px 24px" }}>
+        <Inp label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter" style={{ marginBottom: 24 }} />
+        <Inp label="Password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Enter" style={{ marginBottom: 32 }} />
+        <Btn onClick={() => go("s21")}>Log in</Btn>
+        <p onClick={() => {}} style={{ color: C.black, fontSize: 14, textAlign: "center", marginTop: 20, cursor: "pointer", textDecoration: "underline", fontFamily: ff }}>Forgot password?</p>
       </div>
     </div>
   );
@@ -750,77 +830,109 @@ function S10({ go }) {
 }
 
 function S12({ go }) {
-  const [step, setStep] = useState(0);
+  const [slide, setSlide] = useState(0);
+  var slides = [
+    "Are you ready to transform lives for the better?",
+    "Ennie makes energy healing accessible to anyone, anywhere.",
+    "We securely connect test energy healers and users, protecting your data and privacy and conducting testing to ensure our test energy healers remain effective based on user feedback.",
+  ];
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr title="Become a test healer" onBack={() => step > 0 ? setStep((s) => s - 1) : go("s1")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
-        <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-          <p style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>Step {step + 1} of 3</p>
-          {step === 0 && (
-            <>
-              <select style={{ width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "14px 16px", color: C.black, fontSize: 15, fontFamily: ff, marginBottom: 10, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}>
-                <option value="">Language</option>
-                <option>English</option>
-                <option>Spanish</option>
-                <option>French</option>
-                <option>Portuguese</option>
-                <option>Mandarin</option>
-              </select>
-              <select style={{ width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "14px 16px", color: C.black, fontSize: 15, fontFamily: ff, marginBottom: 10, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}>
-                <option value="">Healing modality</option>
-                <option>Reiki</option>
-                <option>Pranic healing</option>
-                <option>Therapeutic touch</option>
-                <option>Quantum touch</option>
-                <option>Other energy healing</option>
-              </select>
-              <select style={{ width: "100%", boxSizing: "border-box", background: C.white, border: "1.5px solid " + C.border, borderRadius: 14, padding: "14px 16px", color: C.black, fontSize: 15, fontFamily: ff, marginBottom: 16, appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}>
-                <option value="">Timezone</option>
-                <option>UTC-8 (Pacific)</option>
-                <option>UTC-5 (Eastern)</option>
-                <option>UTC+0 (GMT)</option>
-                <option>UTC+1 (CET)</option>
-                <option>UTC+8 (SGT)</option>
-                <option>UTC+10 (AEST)</option>
-              </select>
-              <Btn onClick={() => setStep(1)}>Next</Btn>
-            </>
-          )}
-          {step === 1 && (
-            <>
-              <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 16px" }}>Do you have experience?</h3>
-              <Btn onClick={() => setStep(2)} style={{ marginBottom: 10 }}>Yes</Btn>
-              <Btn primary={false} onClick={() => setStep(2)}>No — show me training</Btn>
-            </>
-          )}
-          {step === 2 && (
-            <>
-              <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 12px" }}>Platform rules</h3>
-              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>Sessions are AI-mediated and anonymous. No recordings.</p>
-              <Btn onClick={() => go("s13")}>I accept — join healer pool</Btn>
-            </>
-          )}
-          <div style={{ marginTop: "auto", display: "flex", justifyContent: "center", gap: 8, paddingTop: 16 }}>
-            {[0, 1, 2].map((i) => (
-              <div key={i} style={{ width: i === step ? 20 : 8, height: 8, borderRadius: 999, background: i === step ? C.black : C.border, transition: "all 0.3s" }} />
-            ))}
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
+      <Hdr onBack={() => go("s1")} />
+      <div style={{ padding: "0 24px", marginBottom: 8 }}>
+        <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: "0 0 4px", opacity: 0.7, fontFamily: ff }}>For test energy healers</p>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: C.black, lineHeight: 1.15, margin: 0, fontFamily: ff }}>Energy healing begins here</h1>
+      </div>
+      <div style={{ flex: 1, padding: "12px 24px", display: "flex", flexDirection: "column" }}>
+        <div style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.yd, boxShadow: "0 4px 24px rgba(200,180,40,0.15)" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
+            <button onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
+            <div style={{ background: C.black, borderRadius: 999, padding: "6px 14px", display: "flex", gap: 8 }}>
+              {slides.map((_, i) => (
+                <div key={i} style={{ width: i === slide ? 20 : 8, height: 8, borderRadius: 999, background: i === slide ? C.white : "rgba(255,255,255,0.3)", transition: "all 0.3s" }} />
+              ))}
+            </div>
+            <button onClick={() => setSlide((s) => (s + 1) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
           </div>
-        </WCard>
+          <p style={{ fontSize: 16, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.5, margin: "0 0 16px", fontFamily: ff, minHeight: 54 }}>{slides[slide]}</p>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <HandArt />
+          </div>
+        </div>
+      </div>
+      <div style={{ padding: "12px 24px 32px", display: "flex", gap: 12 }}>
+        <Btn onClick={() => go("sHReg")} style={{ flex: 1 }}>Join waitlist</Btn>
+        <Btn primary={false} onClick={() => go("sHLogin")} style={{ flex: 1 }}>Log in</Btn>
       </div>
     </div>
   );
+}
+
+function SHReg({ go }) {
+  const [form, setForm] = useState({ first: "", last: "", gender: "", dob: "", email: "", country: "" });
+  const [privacy, setPrivacy] = useState(false);
+  const [terms, setTerms] = useState(false);
+  var valid = form.first && form.last && form.email && privacy && terms;
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.yellow, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s12")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <p style={{ color: C.black, fontSize: 13, margin: "0 0 2px", opacity: 0.7, fontFamily: ff }}>Let's get you set up</p>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Add your details</h2>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
+        <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female", "Non-binary", "Prefer not to say"]} style={{ marginBottom: 20 }} />
+        <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
+        <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
+        <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+          <Chk checked={privacy} onChange={setPrivacy}>I agree to the <u>Privacy Policy</u></Chk>
+          <Chk checked={terms} onChange={setTerms}>I accept the <u>Terms and Conditions</u></Chk>
+        </div>
+        <Btn disabled={!valid} onClick={() => go("s13")}>Next</Btn>
+      </div>
+    </div>
+  );
+}
+
+function SHLogin({ go }) {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.yellow, padding: "12px 20px 20px" }}>
+        <button onClick={() => go("s12")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
+        </button>
+        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Log in to Ennie</h2>
+      </div>
+      <div style={{ flex: 1, padding: "32px 24px" }}>
+        <Inp label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter" style={{ marginBottom: 24 }} />
+        <Inp label="Password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Enter" style={{ marginBottom: 32 }} />
+        <Btn onClick={() => go("s13")}>Log in</Btn>
+        <p onClick={() => {}} style={{ color: C.black, fontSize: 14, textAlign: "center", marginTop: 20, cursor: "pointer", textDecoration: "underline", fontFamily: ff }}>Forgot password?</p>
+      </div>
+    </div>
+  );
+}
+
+function HTag({ children }) {
+  return <span style={{ fontSize: 11, background: C.yp, color: C.yd, borderRadius: 999, padding: "4px 12px", fontWeight: 600 }}>{children}</span>;
 }
 
 function S13({ go }) {
   const [on, setOn] = useState(false);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.purple, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
+      <div style={{ background: C.yellow, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
         <h2 style={{ color: C.black, fontWeight: 800, fontSize: 22, margin: 0, fontFamily: ff }}>Healer dashboard</h2>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px 32px" }}>
-        <div style={{ background: on ? C.pp : C.white, border: "1.5px solid " + (on ? C.pd : C.border), borderRadius: 20, padding: 20, marginBottom: 14 }}>
+        <div style={{ background: on ? C.yp : C.white, border: "1.5px solid " + (on ? C.yd : C.border), borderRadius: 20, padding: 20, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <p style={{ fontWeight: 700, margin: 0, fontSize: 15 }}>{on ? "You're online" : "You're offline"}</p>
@@ -832,25 +944,25 @@ function S13({ go }) {
           </div>
           {on && <Btn onClick={() => go("s14")} style={{ marginTop: 14, fontSize: 14 }}>Simulate incoming case →</Btn>}
         </div>
-        <div style={{ background: C.pp, borderRadius: 20, padding: 16, marginBottom: 14 }}>
+        <div style={{ background: C.yp, borderRadius: 20, padding: 16, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
             <span style={{ fontWeight: 700, fontSize: 14 }}>Qualification</span>
-            <Tag>Active</Tag>
+            <HTag>Active</HTag>
           </div>
           <div style={{ height: 6, background: C.white, borderRadius: 999, marginBottom: 4 }}>
-            <div style={{ height: "100%", width: "60%", background: C.pd, borderRadius: 999 }} />
+            <div style={{ height: "100%", width: "60%", background: C.yd, borderRadius: 999 }} />
           </div>
           <p style={{ color: C.muted, fontSize: 12, margin: 0 }}>18 of 30 sessions</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {[["18", "Sessions"], ["72%", "Change rate"], ["3.1", "Avg"]].map(([v, l], i) => (
             <div key={i} style={{ background: C.white, border: "1px solid " + C.border, borderRadius: 16, padding: 14, textAlign: "center" }}>
-              <p style={{ fontWeight: 900, fontSize: 20, margin: 0, color: C.pd }}>{v}</p>
+              <p style={{ fontWeight: 900, fontSize: 20, margin: 0, color: C.yd }}>{v}</p>
               <p style={{ fontSize: 11, color: C.muted, margin: "2px 0 0" }}>{l}</p>
             </div>
           ))}
         </div>
-        <Btn primary={false} onClick={() => go("s1")} style={{ marginTop: 14, fontSize: 13 }}>← Back</Btn>
+        <Btn primary={false} onClick={() => go("s12")} style={{ marginTop: 14, fontSize: 13 }}>← Back</Btn>
       </div>
     </div>
   );
@@ -864,8 +976,8 @@ function S14({ go }) {
     return () => clearTimeout(t);
   }, [countdown]);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <div style={{ padding: "8px 20px" }}><Tag>Healer view</Tag></div>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
+      <div style={{ padding: "8px 20px" }}><HTag>Healer view</HTag></div>
       <div style={{ flex: 1, padding: "0 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Incoming case</h2>
@@ -873,13 +985,13 @@ function S14({ go }) {
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
             <BMap pins={[{ x: 47, y: 22, side: "front", score: 7 }, { x: 55, y: 38, side: "front", score: 5 }]} readonly small />
             <div style={{ flex: 1 }}>
-              <div style={{ background: C.pp, borderRadius: 12, padding: 12, marginBottom: 8 }}>
+              <div style={{ background: C.yp, borderRadius: 12, padding: 12, marginBottom: 8 }}>
                 <p style={{ color: C.muted, fontSize: 11, margin: "0 0 2px", fontWeight: 600, textTransform: "uppercase" }}>Category</p>
                 <p style={{ color: C.black, fontWeight: 700, fontSize: 15, margin: 0 }}>Chronic pain</p>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 {[["Neck", 7], ["Back", 5]].map(([label, score]) => (
-                  <div key={label} style={{ background: C.pp, borderRadius: 10, padding: "6px 12px", flex: 1 }}>
+                  <div key={label} style={{ background: C.yp, borderRadius: 10, padding: "6px 12px", flex: 1 }}>
                     <p style={{ color: C.muted, fontSize: 11, margin: 0 }}>{label}</p>
                     <p style={{ color: C.black, fontWeight: 800, fontSize: 18, margin: 0 }}>{score}<span style={{ fontSize: 12, color: C.muted }}>/10</span></p>
                   </div>
@@ -887,13 +999,13 @@ function S14({ go }) {
               </div>
             </div>
           </div>
-          <div style={{ background: C.pp, borderRadius: 14, padding: 14 }}>
+          <div style={{ background: C.yp, borderRadius: 14, padding: 14 }}>
             <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", margin: "0 0 4px" }}>AI summary</p>
             <p style={{ color: C.black, fontSize: 14, lineHeight: 1.5, margin: 0 }}>Case reports chronic neck and back pain for approximately 2 weeks. Neck is primary concern, rated 7/10. Described as dull ache on right side.</p>
           </div>
           <div style={{ marginTop: "auto", paddingTop: 16 }}>
             <div style={{ height: 6, background: C.border, borderRadius: 999, marginBottom: 14 }}>
-              <div style={{ height: "100%", background: C.pd, borderRadius: 999, width: ((10 - countdown) / 10 * 100) + "%", transition: "width 1s linear" }} />
+              <div style={{ height: "100%", background: C.yd, borderRadius: 999, width: ((10 - countdown) / 10 * 100) + "%", transition: "width 1s linear" }} />
             </div>
             <Btn onClick={() => go("s15")}>Start session now</Btn>
           </div>
@@ -944,10 +1056,10 @@ function S15({ go }) {
   };
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
       <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Tag>Healer view</Tag>
+          <HTag>Healer view</HTag>
           <CRing seconds={sec} total={TOTAL} size={48} />
         </div>
         <div style={{ display: "flex", gap: 4 }}>
@@ -960,7 +1072,7 @@ function S15({ go }) {
           <BMap pins={pins} readonly small />
           <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
             {pins.map((p, i) => (
-              <div key={i} style={{ background: C.pp, borderRadius: 8, padding: "4px 10px" }}>
+              <div key={i} style={{ background: C.yp, borderRadius: 8, padding: "4px 10px" }}>
                 <span style={{ fontSize: 12 }}>{p.label}: <strong>{p.score}/10</strong></span>
               </div>
             ))}
@@ -968,15 +1080,15 @@ function S15({ go }) {
         </div>
         {mode === "voice" ? (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }}>
-            <p style={{ color: C.pd, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>AI Audio — work eyes-closed</p>
-            <WaveBars count={20} maxH={20} active color={C.pd} frame={wf} />
+            <p style={{ color: C.yd, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>AI Audio — work eyes-closed</p>
+            <WaveBars count={20} maxH={20} active color={C.yd} frame={wf} />
             <p style={{ color: C.muted, fontSize: 12, marginTop: 12, textAlign: "center", lineHeight: 1.5 }}>AI mediates between you and the case.<br />Speak naturally — your words are relayed.</p>
           </div>
         ) : (
           <div ref={sr} style={{ flex: 1, overflowY: "auto", padding: "10px 14px" }}>
             {msgs.map((m, i) => {
               if (m.from === "system") {
-                return <div key={i} style={{ textAlign: "center", marginBottom: 8 }}><span style={{ color: C.muted, fontSize: 11, background: C.pp, padding: "2px 10px", borderRadius: 999 }}>{m.text}</span></div>;
+                return <div key={i} style={{ textAlign: "center", marginBottom: 8 }}><span style={{ color: C.muted, fontSize: 11, background: C.yp, padding: "2px 10px", borderRadius: 999 }}>{m.text}</span></div>;
               }
               return <Bubble key={i} from={m.from} text={m.text} />;
             })}
@@ -995,7 +1107,7 @@ function S15({ go }) {
               <span style={{ color: C.muted, fontSize: 13 }}>Listening... speak to AI mediator</span>
             </div>
           )}
-          <button onClick={() => go("s16")} style={{ padding: "0 16px", height: 42, borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
+          <button onClick={() => go("s16")} style={{ padding: "0 16px", height: 42, borderRadius: 14, background: C.yp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
         </div>
       </div>
     </div>
@@ -1005,18 +1117,18 @@ function S15({ go }) {
 function S16({ go }) {
   const [ready, setReady] = useState(false);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <div style={{ padding: "8px 20px" }}><Tag>Healer view</Tag></div>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
+      <div style={{ padding: "8px 20px" }}><HTag>Healer view</HTag></div>
       <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
         <WCard>
-          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.yp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
             <span style={{ fontSize: 28 }}>✨</span>
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 6px", textAlign: "center", fontFamily: ff }}>Session complete</h2>
           <p style={{ color: C.muted, fontSize: 14, textAlign: "center", margin: "0 0 20px" }}>Here's how the case responded</p>
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
             {[["Neck", 7, 3], ["Back", 5, 2]].map(([label, before, after]) => (
-              <div key={label} style={{ flex: 1, background: C.pp, borderRadius: 14, padding: 14, textAlign: "center" }}>
+              <div key={label} style={{ flex: 1, background: C.yp, borderRadius: 14, padding: 14, textAlign: "center" }}>
                 <p style={{ color: C.muted, fontSize: 12, margin: "0 0 4px" }}>{label}</p>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
                   <span style={{ color: C.muted, fontSize: 16 }}>{before}</span>
@@ -1029,7 +1141,7 @@ function S16({ go }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
             {[["19", "Sessions"], ["74%", "Change rate"], ["3.2", "Avg score"]].map(([v, l], i) => (
               <div key={i} style={{ background: C.white, border: "1px solid " + C.border, borderRadius: 14, padding: 12, textAlign: "center" }}>
-                <p style={{ fontWeight: 900, fontSize: 18, margin: 0, color: C.pd }}>{v}</p>
+                <p style={{ fontWeight: 900, fontSize: 18, margin: 0, color: C.yd }}>{v}</p>
                 <p style={{ fontSize: 10, color: C.muted, margin: "2px 0 0" }}>{l}</p>
               </div>
             ))}
@@ -1167,6 +1279,7 @@ function S21({ go }) {
 /* ===== SCREEN MAP ===== */
 var SCREENS = {
   s1: { comp: S1, label: "1. Landing" },
+  sLogin: { comp: SLogin, label: "1b. Login" },
   s2: { comp: S2, label: "2. Sign Up" },
   s3: { comp: S3, label: "3. Age Gate & DOB" },
   s4: { comp: S4, label: "4. Intake" },
@@ -1176,8 +1289,10 @@ var SCREENS = {
   s8: { comp: S8, label: "8. Symptom Confirm" },
   s9: { comp: S9, label: "9. Live Session" },
   s10: { comp: S10, label: "10. Session End" },
-  s12: { comp: S12, label: "12. Healer Onboard" },
-  s13: { comp: S13, label: "13. Healer Home" },
+  s12: { comp: S12, label: "12. Healer Landing" },
+  sHReg: { comp: SHReg, label: "12b. Healer Sign Up" },
+  sHLogin: { comp: SHLogin, label: "12c. Healer Login" },
+  s13: { comp: S13, label: "13. Healer Dashboard" },
   s14: { comp: S14, label: "14. Match Notification" },
   s15: { comp: S15, label: "15. Healer Session" },
   s16: { comp: S16, label: "16. Healer Post-Session" },
@@ -1188,8 +1303,8 @@ var SCREENS = {
 };
 
 var GROUPS = [
-  { title: "Case Journey", keys: ["s1", "s2", "s3", "s4", "s6", "sq", "s7", "s8", "s9", "s10"] },
-  { title: "Healer", keys: ["s12", "s13", "s14", "s15", "s16"] },
+  { title: "Case Journey", keys: ["s1", "sLogin", "s2", "s3", "s4", "s6", "sq", "s7", "s8", "s9", "s10"] },
+  { title: "Healer", keys: ["s12", "sHReg", "sHLogin", "s13", "s14", "s15", "s16"] },
   { title: "Other", keys: ["s17", "s18", "s20", "s21"] },
 ];
 
@@ -1201,7 +1316,7 @@ export default function ENNIEv1_3() {
   var label = entry.label;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#F0ECF8", padding: 12, fontFamily: ff }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: C.bg, padding: 12, fontFamily: ff }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10, width: 390 }}>
         <span style={{ fontWeight: 800, fontSize: 14, color: C.pd }}>Ennie™</span>
         <span style={{ color: C.muted, fontSize: 12, flex: 1, textAlign: "center" }}>{label}</span>
