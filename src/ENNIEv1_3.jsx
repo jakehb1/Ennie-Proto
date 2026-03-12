@@ -757,7 +757,8 @@ function S12({ go }) {
             <>
               <Inp placeholder="Language" style={{ marginBottom: 10 }} />
               <Inp placeholder="Healing modality" style={{ marginBottom: 10 }} />
-              <Inp placeholder="Timezone" />
+              <Inp placeholder="Timezone" style={{ marginBottom: 16 }} />
+              <Btn onClick={() => setStep(1)}>Next</Btn>
             </>
           )}
           {step === 1 && (
@@ -865,9 +866,10 @@ function S14({ go }) {
             <p style={{ color: C.black, fontSize: 14, lineHeight: 1.5, margin: 0 }}>Case reports chronic neck and back pain for approximately 2 weeks. Neck is primary concern, rated 7/10. Described as dull ache on right side.</p>
           </div>
           <div style={{ marginTop: "auto", paddingTop: 16 }}>
-            <div style={{ height: 6, background: C.border, borderRadius: 999 }}>
+            <div style={{ height: 6, background: C.border, borderRadius: 999, marginBottom: 14 }}>
               <div style={{ height: "100%", background: C.pd, borderRadius: 999, width: ((10 - countdown) / 10 * 100) + "%", transition: "width 1s linear" }} />
             </div>
+            <Btn onClick={() => go("s15")}>Start session now</Btn>
           </div>
         </WCard>
       </div>
@@ -878,9 +880,12 @@ function S14({ go }) {
 function S15({ go }) {
   const TOTAL = 300;
   const [sec, setSec] = useState(TOTAL);
-  const [msgs, setMsgs] = useState([{ from: "system", text: "Case matched" }, { from: "healer", text: "Neck 7, back 5. 2 weeks. Starting." }]);
+  const [mode, setMode] = useState("voice");
+  const [msgs, setMsgs] = useState([{ from: "system", text: "Case matched · Round 1" }, { from: "system", text: "Case: Neck 7/10, Back 5/10 — chronic pain, 2 weeks" }]);
   const [input, setInput] = useState("");
+  const [pins, setPins] = useState([{ x: 47, y: 22, side: "front", score: 7, label: "Neck" }, { x: 55, y: 38, side: "front", score: 5, label: "Back" }]);
   const sr = useRef(null);
+  const [wf, setWf] = useState(0);
 
   useEffect(() => {
     if (sec <= 0) { go("s16"); return; }
@@ -892,43 +897,79 @@ function S15({ go }) {
     if (sr.current) sr.current.scrollTop = sr.current.scrollHeight;
   }, [msgs]);
 
+  useEffect(() => {
+    const t = setInterval(() => setWf((x) => x + 1), 150);
+    return () => clearInterval(t);
+  }, []);
+
+  // Simulate case updates at certain times
+  useEffect(() => {
+    if (sec === 250) setMsgs((m) => [...m, { from: "system", text: "Case reports: neck feels slightly lighter" }]);
+    if (sec === 250) setPins((p) => p.map((pin) => pin.label === "Neck" ? { ...pin, score: 5 } : pin));
+    if (sec === 200) setMsgs((m) => [...m, { from: "system", text: "Case tapped 'I feel a change'" }]);
+    if (sec === 200) setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 1) })));
+  }, [sec]);
+
   const send = () => {
     if (!input.trim()) return;
-    setMsgs((m) => [...m, { from: "user", text: "[To case]: " + input }]);
+    setMsgs((m) => [...m, { from: "user", text: input }]);
     setInput("");
-    setTimeout(() => setMsgs((m) => [...m, { from: "system", text: "Relayed" }]), 500);
+    setTimeout(() => setMsgs((m) => [...m, { from: "system", text: "Relayed to case via AI" }]), 500);
   };
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <div style={{ padding: "8px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Tag>Healer view</Tag>
-        <CRing seconds={sec} total={TOTAL} size={48} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Tag>Healer view</Tag>
+          <CRing seconds={sec} total={TOTAL} size={48} />
+        </div>
+        <div style={{ display: "flex", gap: 4 }}>
+          <Pill active={mode === "voice"} onClick={() => setMode("voice")} style={{ fontSize: 11, padding: "3px 10px" }}>Voice</Pill>
+          <Pill active={mode === "text"} onClick={() => setMode("text")} style={{ fontSize: 11, padding: "3px 10px" }}>Text</Pill>
+        </div>
       </div>
       <div style={{ flex: 1, background: C.white, borderRadius: "24px 24px 0 0", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: 12, borderBottom: "1px solid " + C.border, display: "flex", alignItems: "center", gap: 10 }}>
-          <BMap pins={[{ x: 47, y: 22, side: "front", score: 7 }, { x: 55, y: 38, side: "front", score: 5 }]} readonly small />
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {[["Neck", 7], ["Back", 5]].map(([k, v]) => (
-              <div key={k} style={{ background: C.pp, borderRadius: 8, padding: "4px 10px" }}>
-                <span style={{ fontSize: 12 }}>{k}: <strong>{v}/10</strong></span>
+          <BMap pins={pins} readonly small />
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
+            {pins.map((p, i) => (
+              <div key={i} style={{ background: C.pp, borderRadius: 8, padding: "4px 10px" }}>
+                <span style={{ fontSize: 12 }}>{p.label}: <strong>{p.score}/10</strong></span>
               </div>
             ))}
           </div>
         </div>
-        <div ref={sr} style={{ flex: 1, overflowY: "auto", padding: "10px 14px" }}>
-          {msgs.map((m, i) => {
-            if (m.from === "system") {
-              return <div key={i} style={{ textAlign: "center", marginBottom: 8 }}><span style={{ color: C.muted, fontSize: 11, background: C.pp, padding: "2px 10px", borderRadius: 999 }}>{m.text}</span></div>;
-            }
-            return <Bubble key={i} from={m.from} text={m.text} />;
-          })}
-        </div>
+        {mode === "voice" ? (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }}>
+            <p style={{ color: C.pd, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>AI Audio — work eyes-closed</p>
+            <WaveBars count={20} maxH={20} active color={C.pd} frame={wf} />
+            <p style={{ color: C.muted, fontSize: 12, marginTop: 12, textAlign: "center", lineHeight: 1.5 }}>AI mediates between you and the case.<br />Speak naturally — your words are relayed.</p>
+          </div>
+        ) : (
+          <div ref={sr} style={{ flex: 1, overflowY: "auto", padding: "10px 14px" }}>
+            {msgs.map((m, i) => {
+              if (m.from === "system") {
+                return <div key={i} style={{ textAlign: "center", marginBottom: 8 }}><span style={{ color: C.muted, fontSize: 11, background: C.pp, padding: "2px 10px", borderRadius: 999 }}>{m.text}</span></div>;
+              }
+              return <Bubble key={i} from={m.from} text={m.text} />;
+            })}
+          </div>
+        )}
         <div style={{ padding: "10px 14px 20px", borderTop: "1px solid " + C.border, display: "flex", gap: 8 }}>
-          <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Ask case a question..." style={{ flex: 1, fontSize: 14, padding: 12 }} />
-          <button onClick={send} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: C.white }}>↑</span>
-          </button>
+          {mode === "text" ? (
+            <>
+              <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Message case via AI..." style={{ flex: 1, fontSize: 14, padding: 12 }} />
+              <button onClick={send} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ color: C.white }}>↑</span>
+              </button>
+            </>
+          ) : (
+            <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + C.border, textAlign: "center" }}>
+              <span style={{ color: C.muted, fontSize: 13 }}>Listening... speak to AI mediator</span>
+            </div>
+          )}
+          <button onClick={() => go("s16")} style={{ padding: "0 16px", height: 42, borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
         </div>
       </div>
     </div>
