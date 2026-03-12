@@ -47,13 +47,14 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
       disabled={disabled}
       onClick={(e) => { haptic(primary ? "heavy" : undefined); if (onClick) onClick(e); }}
       style={{
-        width: "100%", padding: "16px 20px", borderRadius: 14,
-        fontWeight: 600, fontSize: 16, cursor: disabled ? "default" : "pointer",
+        width: "100%", padding: "16px 20px", borderRadius: 16,
+        fontWeight: 700, fontSize: 16, cursor: disabled ? "default" : "pointer",
         fontFamily: ff, opacity: disabled ? 0.35 : 1,
         background: primary ? C.black : C.white,
         color: primary ? C.white : C.black,
-        border: primary ? "none" : "1.5px solid " + C.black,
-        boxShadow: "none", letterSpacing: 0.2, ...style,
+        border: primary ? "none" : "1.5px solid " + C.border,
+        boxShadow: primary ? "0 4px 14px rgba(0,0,0,0.15)" : "0 2px 8px rgba(0,0,0,0.04)",
+        letterSpacing: 0.3, transition: "all 0.2s ease", ...style,
       }}
     >
       {children}
@@ -61,19 +62,56 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
   );
 }
 
+function Slider({ value, onChange, min = 0, max = 10, color }) {
+  var accent = color || C.pd;
+  var pct = ((value - min) / (max - min)) * 100;
+  return (
+    <div style={{ position: "relative", height: 32, display: "flex", alignItems: "center", cursor: "pointer", touchAction: "none" }}
+      onPointerDown={(e) => {
+        var rect = e.currentTarget.getBoundingClientRect();
+        var update = function (ev) {
+          var x = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+          onChange(Math.round(x * (max - min) + min));
+        };
+        update(e);
+        var onMove = function (ev) { update(ev); };
+        var onUp = function () { window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerup", onUp); };
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+      }}
+    >
+      <div style={{ position: "absolute", left: 0, right: 0, height: 6, borderRadius: 999, background: C.border }}>
+        <div style={{ height: "100%", width: pct + "%", borderRadius: 999, background: accent, transition: "width 0.1s" }} />
+      </div>
+      <div style={{ position: "absolute", left: "calc(" + pct + "% - 14px)", width: 28, height: 28, borderRadius: 999, background: C.white, border: "3px solid " + accent, boxShadow: "0 2px 8px rgba(0,0,0,0.15)", transition: "left 0.1s" }} />
+    </div>
+  );
+}
+
+function Toggle({ on, onToggle, color }) {
+  var accent = color || C.black;
+  return (
+    <button onClick={onToggle} style={{ width: 56, height: 30, borderRadius: 999, background: on ? accent : C.border, position: "relative", border: "none", cursor: "pointer", transition: "background 0.3s", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)" }}>
+      <div style={{ width: 24, height: 24, background: C.white, borderRadius: 999, position: "absolute", top: 3, left: on ? 29 : 3, transition: "left 0.3s cubic-bezier(0.4,0,0.2,1)", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }} />
+    </button>
+  );
+}
+
 function Inp({ value, onChange, placeholder, style, onKeyDown, label }) {
   return (
     <div style={{ width: "100%", ...style }}>
-      {label && <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.black, marginBottom: 4, fontFamily: ff }}>{label}</label>}
+      {label && <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: C.muted, marginBottom: 6, fontFamily: ff, letterSpacing: 0.3 }}>{label}</label>}
       <input
         value={value} onChange={onChange} onKeyDown={onKeyDown}
         placeholder={placeholder}
         style={{
           width: "100%", boxSizing: "border-box", background: "transparent",
-          border: "none", borderBottom: "1.5px solid " + C.border,
-          padding: "10px 0", color: C.black, fontSize: 15,
-          outline: "none", fontFamily: ff,
+          border: "none", borderBottom: "2px solid " + C.border,
+          padding: "12px 0", color: C.black, fontSize: 15,
+          outline: "none", fontFamily: ff, transition: "border-color 0.2s",
         }}
+        onFocus={(e) => { e.target.style.borderBottomColor = C.pd; }}
+        onBlur={(e) => { e.target.style.borderBottomColor = C.border; }}
       />
     </div>
   );
@@ -81,7 +119,7 @@ function Inp({ value, onChange, placeholder, style, onKeyDown, label }) {
 
 function WCard({ children, style }) {
   return (
-    <div style={{ background: C.white, borderRadius: 24, padding: 24, boxShadow: "0 2px 16px rgba(140,120,200,0.12)", ...style }}>
+    <div style={{ background: C.white, borderRadius: 24, padding: 24, boxShadow: "0 4px 20px rgba(140,120,200,0.1)", ...style }}>
       {children}
     </div>
   );
@@ -102,7 +140,7 @@ function Hdr({ title, onBack }) {
 
 function Pill({ children, active, onClick, style }) {
   return (
-    <button onClick={onClick} style={{ fontSize: 13, padding: "6px 16px", borderRadius: 999, fontWeight: 600, border: active ? "none" : "1.5px solid " + C.border, cursor: "pointer", fontFamily: ff, background: active ? C.black : C.white, color: active ? C.white : C.black, ...style }}>
+    <button onClick={onClick} style={{ fontSize: 13, padding: "7px 18px", borderRadius: 999, fontWeight: 600, border: active ? "none" : "1.5px solid " + C.border, cursor: "pointer", fontFamily: ff, background: active ? C.black : C.white, color: active ? C.white : C.black, transition: "all 0.2s ease", boxShadow: active ? "0 2px 8px rgba(0,0,0,0.12)" : "none", ...style }}>
       {children}
     </button>
   );
@@ -650,12 +688,12 @@ function S8({ go }) {
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 16px", fontFamily: ff }}>Still feeling these?</h2>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}><BMap pins={pins} readonly small /></div>
           {Object.entries(scores).map(([k, v]) => (
-            <div key={k} style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+            <div key={k} style={{ marginBottom: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                 <span style={{ fontWeight: 700, textTransform: "capitalize", fontSize: 15 }}>{k} pain</span>
-                <span style={{ fontWeight: 800, fontSize: 18, color: C.pd }}>{v}/10</span>
+                <span style={{ fontWeight: 800, fontSize: 20, color: v <= 3 ? C.green : v <= 6 ? C.amber : C.red }}>{v}/10</span>
               </div>
-              <input type="range" min="0" max="10" value={v} onChange={(e) => setScores((s) => ({ ...s, [k]: Number(e.target.value) }))} style={{ width: "100%", accentColor: C.pd }} />
+              <Slider value={v} onChange={(val) => { haptic(); setScores((s) => ({ ...s, [k]: val })); }} color={v <= 3 ? C.green : v <= 6 ? C.amber : C.red} />
             </div>
           ))}
           <Btn onClick={() => go("s9")}>I'm ready — start now</Btn>
@@ -988,12 +1026,12 @@ function S11({ go }) {
           {!submitted ? (
             <>
               {Object.entries(scores).map(([k, v]) => (
-                <div key={k} style={{ marginBottom: 16, textAlign: "left" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <div key={k} style={{ marginBottom: 20, textAlign: "left" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                     <span style={{ fontWeight: 700, textTransform: "capitalize", fontSize: 15 }}>{k} pain</span>
-                    <span style={{ fontWeight: 800, fontSize: 18, color: v <= 2 ? C.green : C.pd }}>{v}/10</span>
+                    <span style={{ fontWeight: 800, fontSize: 20, color: v <= 2 ? C.green : v <= 5 ? C.amber : C.pd }}>{v}/10</span>
                   </div>
-                  <input type="range" min="0" max="10" value={v} onChange={(e) => { haptic(); setScores((s) => ({ ...s, [k]: Number(e.target.value) })); }} style={{ width: "100%", accentColor: C.pd }} />
+                  <Slider value={v} onChange={(val) => { haptic(); setScores((s) => ({ ...s, [k]: val })); }} color={v <= 2 ? C.green : v <= 5 ? C.amber : C.pd} />
                 </div>
               ))}
               <div style={{ background: C.pp, borderRadius: 14, padding: 14, margin: "8px 0 16px" }}>
@@ -1085,9 +1123,7 @@ function S13({ go }) {
               <p style={{ fontWeight: 700, margin: 0, fontSize: 15 }}>{on ? "You're online" : "You're offline"}</p>
               <p style={{ color: C.muted, fontSize: 12, margin: 0 }}>{on ? "Accepting sessions" : "Toggle to start"}</p>
             </div>
-            <button onClick={() => setOn((o) => !o)} style={{ width: 52, height: 28, borderRadius: 999, background: on ? C.black : C.border, position: "relative", border: "none", cursor: "pointer" }}>
-              <div style={{ width: 22, height: 22, background: C.white, borderRadius: 999, position: "absolute", top: 3, left: on ? 27 : 3, transition: "all 0.3s" }} />
-            </button>
+            <Toggle on={on} onToggle={() => setOn((o) => !o)} color={C.yd} />
           </div>
           {on && <Btn onClick={() => go("s14")} style={{ marginTop: 14, fontSize: 14 }}>Simulate incoming case →</Btn>}
         </div>
@@ -1342,37 +1378,56 @@ function S16({ go }) {
 function S17({ go }) {
   const [sel, setSel] = useState(null);
   var tiers = [
-    { id: 0, name: "Standard", price: "$50", wait: "~4 weeks", rate: "70%", detail: "90% reduction", type: "Qualified healer", bg: C.white },
-    { id: 1, name: "Priority", price: "$150", wait: "~7 days", rate: "70%", detail: "90% reduction", type: "Qualified healer", bg: C.white, badge: "Popular" },
-    { id: 2, name: "Immediate", price: "$350", wait: "~10 mins", rate: "70%", detail: "90% reduction", type: "Qualified healer", bg: C.pink, badge: "Fastest" },
+    { id: 0, name: "Standard", price: "$50", per: "per session", wait: "~4 weeks", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "🤲" },
+    { id: 1, name: "Priority", price: "$150", per: "per session", wait: "~7 days", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "⚡", badge: "Most popular" },
+    { id: 2, name: "Immediate", price: "$350", per: "per session", wait: "~10 mins", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "✨", badge: "Fastest" },
   ];
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr onBack={() => go("s3")} />
-      <div style={{ padding: "0 20px 8px" }}>
-        <h2 style={{ fontSize: 26, fontWeight: 800, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Paid sessions</h2>
-        <p style={{ color: C.black, opacity: 0.6, fontSize: 13, margin: 0 }}>No active symptoms needed — book a qualified healer</p>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.purple, padding: "16px 24px 28px", borderRadius: "0 0 28px 28px" }}>
+        <Hdr onBack={() => go("s3")} />
+        <h2 style={{ fontSize: 28, fontWeight: 900, color: C.black, margin: "0 0 6px", fontFamily: ff }}>Paid sessions</h2>
+        <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>No active symptoms needed — book a qualified healer</p>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "8px 20px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
-        {tiers.map((t) => (
-          <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: t.bg, borderRadius: 20, padding: 20, cursor: "pointer", position: "relative", border: sel === t.id ? "3px solid " + C.black : "1px solid " + C.border, boxShadow: sel === t.id ? "0 4px 20px rgba(0,0,0,0.1)" : "0 2px 16px rgba(140,120,200,0.12)" }}>
-            {t.badge && <span style={{ position: "absolute", top: 12, right: 16, fontSize: 10, fontWeight: 700, background: C.black, color: C.white, padding: "2px 10px", borderRadius: 999 }}>{t.badge}</span>}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-              <span style={{ fontSize: 20, fontWeight: 800, color: C.black, fontFamily: ff }}>{t.name}</span>
-              <span style={{ fontSize: 22, fontWeight: 900, color: C.black, fontFamily: ff }}>{t.price}</span>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 12px", display: "flex", flexDirection: "column", gap: 14 }}>
+        {tiers.map((t) => {
+          var isSel = sel === t.id;
+          return (
+            <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: C.white, borderRadius: 22, padding: "22px 20px", cursor: "pointer", position: "relative", border: isSel ? "2.5px solid " + C.pd : "1.5px solid " + C.border, boxShadow: isSel ? "0 6px 24px rgba(107,91,212,0.2)" : "0 2px 12px rgba(0,0,0,0.04)", transition: "all 0.25s ease", transform: isSel ? "scale(1.02)" : "scale(1)" }}>
+              {t.badge && <span style={{ position: "absolute", top: -10, right: 20, fontSize: 11, fontWeight: 700, background: t.id === 2 ? C.pd : C.black, color: C.white, padding: "4px 14px", borderRadius: 999, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>{t.badge}</span>}
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 14, background: t.id === 2 ? C.pp : C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{t.icon}</div>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: C.black, fontFamily: ff, display: "block" }}>{t.name}</span>
+                  <span style={{ fontSize: 12, color: C.muted }}>{t.type}</span>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <span style={{ fontSize: 24, fontWeight: 900, color: C.black, fontFamily: ff, display: "block", lineHeight: 1 }}>{t.price}</span>
+                  <span style={{ fontSize: 11, color: C.muted }}>{t.per}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 12, padding: "10px 12px", textAlign: "center" }}>
+                  <p style={{ fontSize: 11, color: C.muted, margin: "0 0 2px" }}>Wait time</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: C.black, margin: 0 }}>{t.wait}</p>
+                </div>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 12, padding: "10px 12px", textAlign: "center" }}>
+                  <p style={{ fontSize: 11, color: C.muted, margin: "0 0 2px" }}>Success</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: C.green, margin: 0 }}>{t.rate}</p>
+                </div>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 12, padding: "10px 12px", textAlign: "center" }}>
+                  <p style={{ fontSize: 11, color: C.muted, margin: "0 0 2px" }}>Avg result</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: C.pd, margin: 0 }}>{t.detail.replace("avg ", "")}</p>
+                </div>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 12, color: C.muted }}>Wait: <strong style={{ color: C.black }}>{t.wait}</strong></span>
-              <span style={{ fontSize: 12, color: C.muted }}>Success: <strong style={{ color: C.green }}>{t.rate}</strong> report {t.detail}</span>
-            </div>
-            <span style={{ fontSize: 12, color: C.muted }}>{t.type}</span>
-          </div>
-        ))}
-        <div style={{ background: C.pp, borderRadius: 14, padding: 14, textAlign: "center" }}>
-          <p style={{ color: C.pd, fontSize: 13, margin: 0 }}>Have active symptoms? <span onClick={() => go("s3")} style={{ fontWeight: 700, textDecoration: "underline", cursor: "pointer" }}>Try a free session</span></p>
+          );
+        })}
+        <div style={{ background: C.pp, borderRadius: 16, padding: 16, textAlign: "center" }}>
+          <p style={{ color: C.pd, fontSize: 13, margin: 0, fontWeight: 500 }}>Have active symptoms? <span onClick={() => go("s3")} style={{ fontWeight: 700, textDecoration: "underline", cursor: "pointer" }}>Try a free session</span></p>
         </div>
       </div>
-      <div style={{ padding: "12px 20px 28px" }}>
+      <div style={{ padding: "12px 20px 28px", background: C.white, borderTop: "1px solid " + C.border }}>
         <Btn disabled={sel === null} onClick={() => go("s18")}>
           {sel === null ? "Select a tier" : "Pay " + tiers[sel].price + " →"}
         </Btn>
@@ -1645,49 +1700,86 @@ function S23({ go }) {
   );
 }
 
+function AnimNum({ target, suffix }) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    var start = 0;
+    var end = typeof target === "number" ? target : parseFloat(target) || 0;
+    var dur = 800;
+    var t0 = Date.now();
+    var frame = function () {
+      var pct = Math.min(1, (Date.now() - t0) / dur);
+      var ease = 1 - Math.pow(1 - pct, 3);
+      setVal(Math.round(start + (end - start) * ease));
+      if (pct < 1) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }, [target]);
+  return <>{val}{suffix || ""}</>;
+}
+
 function SAdmin({ go }) {
-  var stats = { users: 1247, healers: 89, activeSessions: 12, avgChange: "3.4", successRate: "72%" };
+  var stats = { users: 1247, healers: 89, activeSessions: 12, avgChange: 3.4, successRate: 72 };
+  const [expanded, setExpanded] = useState(null);
   var recent = [
-    { id: "S-4821", case: "Neck 7→3", healer: "A7Q2", status: "Completed" },
-    { id: "S-4820", case: "Back 6→2", healer: "B3K1", status: "Completed" },
-    { id: "S-4819", case: "Shoulder 8→5", healer: "C9M4", status: "In progress" },
-    { id: "S-4818", case: "Knee 5→3", healer: "A7Q2", status: "Completed" },
+    { id: "S-4821", case: "Neck 7→3", healer: "A7Q2", status: "Completed", time: "2:30 PM", dur: "5:00" },
+    { id: "S-4820", case: "Back 6→2", healer: "B3K1", status: "Completed", time: "11:00 AM", dur: "5:00" },
+    { id: "S-4819", case: "Shoulder 8→5", healer: "C9M4", status: "In progress", time: "4:15 PM", dur: "3:22" },
+    { id: "S-4818", case: "Knee 5→3", healer: "A7Q2", status: "Completed", time: "9:45 AM", dur: "5:00" },
   ];
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.green, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
-        <h2 style={{ color: C.white, fontWeight: 800, fontSize: 22, margin: "0 0 4px", fontFamily: ff }}>Admin Dashboard</h2>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
+      <div style={{ background: C.green, padding: "20px 24px 28px", borderRadius: "0 0 28px 28px" }}>
+        <h2 style={{ color: C.white, fontWeight: 900, fontSize: 24, margin: "0 0 4px", fontFamily: ff }}>Admin Dashboard</h2>
         <p style={{ color: C.white, opacity: 0.8, fontSize: 13, margin: 0 }}>Ennie platform overview</p>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px 32px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-          {[["Users", stats.users], ["Healers", stats.healers], ["Active now", stats.activeSessions], ["Avg change", stats.avgChange + " pts"]].map(([l, v], i) => (
-            <div key={i} style={{ background: C.bg, borderRadius: 16, padding: 16, textAlign: "center" }}>
-              <p style={{ fontWeight: 900, fontSize: 22, margin: 0, color: C.black }}>{v}</p>
-              <p style={{ fontSize: 11, color: C.muted, margin: "2px 0 0" }}>{l}</p>
+      <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px 32px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
+          {[["Users", stats.users, ""], ["Healers", stats.healers, ""], ["Active now", stats.activeSessions, ""], ["Avg change", stats.avgChange, " pts"]].map(([l, v, suf], i) => (
+            <div key={i} style={{ background: C.white, borderRadius: 18, padding: "18px 16px", textAlign: "center", boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+              <p style={{ fontWeight: 900, fontSize: 26, margin: 0, color: C.black, fontFamily: ff }}><AnimNum target={v} suffix={suf} /></p>
+              <p style={{ fontSize: 12, color: C.muted, margin: "4px 0 0", fontWeight: 500 }}>{l}</p>
             </div>
           ))}
         </div>
-        <div style={{ background: C.green + "18", borderRadius: 16, padding: 16, marginBottom: 16 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: 700, fontSize: 14 }}>Platform success rate</span>
-            <span style={{ fontWeight: 900, fontSize: 22, color: C.green }}>{stats.successRate}</span>
+        <div style={{ background: C.white, borderRadius: 18, padding: "18px 20px", marginBottom: 18, boxShadow: "0 2px 10px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <span style={{ fontWeight: 700, fontSize: 15 }}>Platform success rate</span>
+            <span style={{ fontWeight: 900, fontSize: 26, color: C.green, fontFamily: ff }}><AnimNum target={stats.successRate} suffix="%" /></span>
           </div>
-          <div style={{ height: 6, background: C.white, borderRadius: 999, marginTop: 8 }}>
-            <div style={{ height: "100%", width: "72%", background: C.green, borderRadius: 999 }} />
+          <div style={{ height: 8, background: C.bg, borderRadius: 999 }}>
+            <div style={{ height: "100%", width: stats.successRate + "%", background: "linear-gradient(90deg, " + C.green + ", #2ECC71)", borderRadius: 999, transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
           </div>
         </div>
-        <p style={{ color: C.pd, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Recent sessions</p>
+        <p style={{ color: C.pd, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>Recent sessions</p>
         {recent.map((s, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid " + C.border }}>
-            <div>
-              <span style={{ fontWeight: 600, fontSize: 13, color: C.black }}>{s.id}</span>
-              <p style={{ color: C.muted, fontSize: 12, margin: "2px 0 0" }}>{s.case} · {s.healer}</p>
+          <div key={i} onClick={() => { haptic(); setExpanded(expanded === i ? null : i); }} style={{ background: C.white, borderRadius: 16, padding: "14px 16px", marginBottom: 8, cursor: "pointer", boxShadow: "0 1px 6px rgba(0,0,0,0.03)", transition: "all 0.2s" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <span style={{ fontWeight: 700, fontSize: 14, color: C.black }}>{s.id}</span>
+                <p style={{ color: C.muted, fontSize: 12, margin: "3px 0 0" }}>{s.case} · {s.healer}</p>
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 600, color: s.status === "Completed" ? C.green : C.amber, background: (s.status === "Completed" ? C.green : C.amber) + "14", padding: "4px 12px", borderRadius: 999 }}>{s.status}</span>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 600, color: s.status === "Completed" ? C.green : C.amber, background: (s.status === "Completed" ? C.green : C.amber) + "18", padding: "2px 10px", borderRadius: 999 }}>{s.status}</span>
+            {expanded === i && (
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid " + C.border, display: "flex", gap: 10 }}>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                  <p style={{ color: C.muted, fontSize: 10, margin: "0 0 2px" }}>Time</p>
+                  <p style={{ fontWeight: 700, fontSize: 13, margin: 0 }}>{s.time}</p>
+                </div>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                  <p style={{ color: C.muted, fontSize: 10, margin: "0 0 2px" }}>Duration</p>
+                  <p style={{ fontWeight: 700, fontSize: 13, margin: 0 }}>{s.dur}</p>
+                </div>
+                <div style={{ flex: 1, background: C.bg, borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                  <p style={{ color: C.muted, fontSize: 10, margin: "0 0 2px" }}>Healer</p>
+                  <p style={{ fontWeight: 700, fontSize: 13, margin: 0 }}>{s.healer}</p>
+                </div>
+              </div>
+            )}
           </div>
         ))}
-        <Btn primary={false} onClick={() => go("s21")} style={{ marginTop: 16, fontSize: 13 }}>← Back</Btn>
+        <Btn primary={false} onClick={() => go("s21")} style={{ marginTop: 12 }}>← Back</Btn>
       </div>
     </div>
   );
