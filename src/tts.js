@@ -71,3 +71,69 @@ async function processQueue() {
 export function isTTSAvailable() {
   return !!API_KEY;
 }
+
+// --- Speech Recognition (STT) ---
+const SpeechRecognition = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
+
+export function isSTTAvailable() {
+  return !!SpeechRecognition;
+}
+
+export function createListener(onResult, onStateChange) {
+  if (!SpeechRecognition) return null;
+  const rec = new SpeechRecognition();
+  rec.continuous = false;
+  rec.interimResults = true;
+  rec.lang = "en-US";
+
+  let active = false;
+  let interim = "";
+
+  rec.onresult = (e) => {
+    let final = "";
+    interim = "";
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        final += e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    if (onStateChange) onStateChange({ listening: true, interim });
+    if (final) {
+      onResult(final.trim());
+      interim = "";
+    }
+  };
+
+  rec.onend = () => {
+    if (active) {
+      // Auto-restart if still supposed to be listening
+      try { rec.start(); } catch (_) {}
+    } else {
+      if (onStateChange) onStateChange({ listening: false, interim: "" });
+    }
+  };
+
+  rec.onerror = (e) => {
+    if (e.error === "not-allowed") {
+      active = false;
+      if (onStateChange) onStateChange({ listening: false, interim: "", error: "Microphone access denied" });
+    }
+  };
+
+  return {
+    start() {
+      if (active) return;
+      active = true;
+      if (onStateChange) onStateChange({ listening: true, interim: "" });
+      try { rec.start(); } catch (_) {}
+    },
+    stop() {
+      active = false;
+      try { rec.stop(); } catch (_) {}
+      if (onStateChange) onStateChange({ listening: false, interim: "" });
+    },
+    isActive() { return active; },
+  };
+}

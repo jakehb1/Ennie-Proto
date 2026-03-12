@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { speak, stopSpeaking } from "./tts.js";
+import { speak, stopSpeaking, createListener, isSTTAvailable } from "./tts.js";
 
 function haptic(style) {
   if (navigator.vibrate) navigator.vibrate(style === "heavy" ? 30 : 10);
@@ -422,14 +422,18 @@ function S4({ go }) {
   const [showMap, setShowMap] = useState(false);
   const [mode, setMode] = useState("voice");
   const sr = useRef(null);
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState("");
+  const listenerRef = useRef(null);
 
   const rep = ["Show me on the body map where you feel it.", "Got it. How long has this been going on?", "Set the severity — 0 to 10.", "Sounds like chronic pain. Does that feel right?", "You qualify for a free session."];
 
-  const send = (text) => {
+  const send = useCallback((text) => {
     const msg = text || input.trim();
     if (!msg) return;
     setMsgs((m) => [...m, { from: "user", text: msg }]);
     setInput("");
+    setInterim("");
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
@@ -439,7 +443,7 @@ function S4({ go }) {
       if (step === 0) setShowMap(true);
       setStep((s) => s + 1);
     }, 800);
-  };
+  }, [input, step]);
 
   const addPin = (pin) => {
     setPins((p) => [...p, pin]);
@@ -453,10 +457,26 @@ function S4({ go }) {
     }, 600);
   };
 
-  const simV = () => {
-    var responses = ["My neck is really sore", "About two weeks", "Around a 7", "Yeah that sounds right", "OK let's do it"];
-    send(responses[step] || "Yes");
-  };
+  // Set up speech recognition
+  useEffect(() => {
+    if (!isSTTAvailable()) return;
+    var sendRef = send;
+    listenerRef.current = createListener(
+      (text) => { sendRef(text); },
+      (state) => { setListening(state.listening); setInterim(state.interim || ""); }
+    );
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [send]);
+
+  // Auto-start listening in voice mode
+  useEffect(() => {
+    if (mode === "voice" && listenerRef.current && step < 5) {
+      listenerRef.current.start();
+    } else if (mode !== "voice" && listenerRef.current) {
+      listenerRef.current.stop();
+    }
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [mode, step]);
 
   useEffect(() => {
     if (sr.current) sr.current.scrollTop = sr.current.scrollHeight;
@@ -468,10 +488,11 @@ function S4({ go }) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: C.white, borderRadius: "24px 24px 0 0", overflow: "hidden" }}>
         {mode === "voice" && !showMap && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, flex: 1 }}>
-            <p style={{ fontSize: 22, fontWeight: 700, color: C.black, marginBottom: 24, fontFamily: ff }}>Processing...</p>
-            <div style={{ width: 140, height: 140, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 24, opacity: 0.4 }}>🎙</span>
+            <p style={{ fontSize: 22, fontWeight: 700, color: C.black, marginBottom: 24, fontFamily: ff }}>{listening ? "Listening..." : "Starting mic..."}</p>
+            <div style={{ width: 140, height: 140, borderRadius: 999, background: listening ? C.pp : C.border, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s", animation: listening ? "pulse 2s infinite" : "none" }}>
+              <span style={{ fontSize: 24, opacity: listening ? 1 : 0.4 }}>🎙</span>
             </div>
+            {interim && <p style={{ color: C.muted, fontSize: 14, marginTop: 16, fontStyle: "italic", fontFamily: ff }}>{interim}</p>}
           </div>
         )}
         <div style={{ display: "flex", justifyContent: "center", padding: "8px 0" }}>
@@ -502,9 +523,16 @@ function S4({ go }) {
               </>
             )
           ) : (
-            <Btn onClick={() => { if (step >= 5) go("s6"); else simV(); }} style={{ fontSize: 14 }}>
-              {step >= 5 ? "Continue →" : "Tap to simulate voice"}
-            </Btn>
+            step >= 5 ? (
+              <Btn onClick={() => go("s6")} style={{ fontSize: 14 }}>Continue →</Btn>
+            ) : (
+              <div style={{ flex: 1, padding: 14, borderRadius: 14, border: "1.5px solid " + (listening ? C.green : C.border), textAlign: "center", background: listening ? C.green + "11" : "transparent", transition: "all 0.3s" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: 999, background: listening ? C.green : C.light, animation: listening ? "pulse 1.5s infinite" : "none" }} />
+                  <span style={{ color: listening ? C.green : C.muted, fontSize: 13, fontWeight: 600 }}>{listening ? (interim || "Speak now...") : "Starting mic..."}</span>
+                </div>
+              </div>
+            )
           )}
         </div>
       </div>
@@ -644,6 +672,9 @@ function S9({ go }) {
   const [pins, setPins] = useState([{ x: 47, y: 22, side: "front", score: 7, label: "Neck" }, { x: 55, y: 38, side: "front", score: 5, label: "Back" }]);
   const [msgs, setMsgs] = useState([{ from: "system", text: "Round 1 · Session started" }, { from: "healer", text: "Hi. Neck at 7, back at 5. Is the neck pain more left or right?" }]);
   const [lastH, setLastH] = useState("Is the neck pain more left or right?");
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState("");
+  const listenerRef = useRef(null);
 
   useEffect(() => { speak("Hi. Neck at 7, back at 5. Is the neck pain more left or right?"); return () => stopSpeaking(); }, []);
 
@@ -674,6 +705,47 @@ function S9({ go }) {
     const t = setInterval(() => setWf((x) => x + 1), 150);
     return () => clearInterval(t);
   }, []);
+
+  // Speech recognition for voice mode
+  const sendVoice = useCallback((text) => {
+    if (!text) return;
+    setMsgs((m) => [...m, { from: "user", text }]);
+    setInterim("");
+    setSp("user");
+    setTimeout(() => setSp("idle"), 1500);
+    var l = text.toLowerCase();
+    if (l.includes("better") || l.includes("lighter") || l.includes("eased") || l.includes("shifted") || l.includes("change")) {
+      setSec(TOTAL);
+      setRound((r) => r + 1);
+      setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) })));
+      setTimeout(() => {
+        setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Timer reset" }]);
+        setTimeout(() => {
+          var t = "Good — I felt that. Continuing.";
+          setSp("healer");
+          setLastH(t);
+          setMsgs((m) => [...m, { from: "healer", text: t }]);
+          speak(t);
+          setTimeout(() => setSp("idle"), 2000);
+        }, 500);
+      }, 400);
+    }
+  }, [round]);
+
+  useEffect(() => {
+    if (!isSTTAvailable()) return;
+    listenerRef.current = createListener(
+      (text) => { sendVoice(text); },
+      (state) => { setListening(state.listening); setInterim(state.interim || ""); }
+    );
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [sendVoice]);
+
+  useEffect(() => {
+    if (mode === "voice" && listenerRef.current) listenerRef.current.start();
+    else if (listenerRef.current) listenerRef.current.stop();
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [mode]);
 
   const send = (text) => {
     var msg = text || input.trim();
@@ -738,20 +810,21 @@ function S9({ go }) {
               </div>
             </div>
             <div style={{ padding: "16px 20px", borderTop: "1px solid " + C.border, background: C.pp + "44" }}>
-              <WaveBars count={24} maxH={24} active={sp !== "idle"} color={sp === "healer" ? C.pd : C.green} frame={wf} />
+              <WaveBars count={24} maxH={24} active={sp !== "idle" || listening} color={sp === "healer" ? C.pd : C.green} frame={wf} />
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8 }}>
-                <div style={{ width: 8, height: 8, borderRadius: 999, background: sp !== "idle" ? C.green : C.light }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: sp === "healer" ? C.pd : sp === "user" ? C.green : C.muted }}>
-                  {sp === "healer" ? "Healer speaking" : sp === "user" ? "You" : "Live — speak anytime"}
+                <div style={{ width: 8, height: 8, borderRadius: 999, background: (sp !== "idle" || listening) ? C.green : C.light }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: sp === "healer" ? C.pd : sp === "user" ? C.green : listening ? C.green : C.muted }}>
+                  {sp === "healer" ? "Healer speaking" : sp === "user" ? "You" : listening ? "Listening — speak anytime" : "Live — speak anytime"}
                 </span>
               </div>
               {sp === "healer" && <p style={{ color: C.muted, fontSize: 13, textAlign: "center", margin: "6px 0 0", fontStyle: "italic" }}>"{lastH}"</p>}
+              {interim && sp === "idle" && <p style={{ color: C.green, fontSize: 13, textAlign: "center", margin: "6px 0 0", fontStyle: "italic" }}>"{interim}"</p>}
             </div>
             <div style={{ padding: "10px 16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
-              <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 15, color: C.white }}>I feel a change</button>
+              <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); speak("Good — I felt that. Continuing."); }} style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 15, color: C.white }}>I feel a change</button>
               <div style={{ display: "flex", gap: 8 }}>
-                <div onClick={simV} style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + C.border, textAlign: "center", cursor: "pointer" }}>
-                  <span style={{ color: C.muted, fontSize: 13 }}>Simulate voice</span>
+                <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + (listening ? C.green : C.border), textAlign: "center", background: listening ? C.green + "11" : "transparent" }}>
+                  <span style={{ color: listening ? C.green : C.muted, fontSize: 13 }}>{listening ? "Mic active" : "Mic off"}</span>
                 </div>
                 <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
                 <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
@@ -1056,6 +1129,9 @@ function S15({ go }) {
   const [pins, setPins] = useState([{ x: 47, y: 22, side: "front", score: 7, label: "Neck" }, { x: 55, y: 38, side: "front", score: 5, label: "Back" }]);
   const sr = useRef(null);
   const [wf, setWf] = useState(0);
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState("");
+  const listenerRef = useRef(null);
 
   useEffect(() => { return () => stopSpeaking(); }, []);
 
@@ -1081,6 +1157,28 @@ function S15({ go }) {
     if (sec === 200) { setMsgs((m) => [...m, { from: "system", text: "Case tapped 'I feel a change'" }]); speak("Case tapped I feel a change"); }
     if (sec === 200) setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 1) })));
   }, [sec]);
+
+  const sendVoice = useCallback((text) => {
+    if (!text) return;
+    setMsgs((m) => [...m, { from: "user", text }]);
+    setInterim("");
+    setTimeout(() => setMsgs((m) => [...m, { from: "system", text: "Relayed to case via AI" }]), 500);
+  }, []);
+
+  useEffect(() => {
+    if (!isSTTAvailable()) return;
+    listenerRef.current = createListener(
+      (text) => { sendVoice(text); },
+      (state) => { setListening(state.listening); setInterim(state.interim || ""); }
+    );
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [sendVoice]);
+
+  useEffect(() => {
+    if (mode === "voice" && listenerRef.current) listenerRef.current.start();
+    else if (listenerRef.current) listenerRef.current.stop();
+    return () => { if (listenerRef.current) listenerRef.current.stop(); };
+  }, [mode]);
 
   const send = () => {
     if (!input.trim()) return;
@@ -1114,8 +1212,9 @@ function S15({ go }) {
         </div>
         {mode === "voice" ? (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }}>
-            <p style={{ color: C.yd, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>AI Audio — work eyes-closed</p>
-            <WaveBars count={20} maxH={20} active color={C.yd} frame={wf} />
+            <p style={{ color: C.yd, fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{listening ? "Mic active — speak naturally" : "AI Audio — work eyes-closed"}</p>
+            <WaveBars count={20} maxH={20} active={listening} color={C.yd} frame={wf} />
+            {interim && <p style={{ color: C.yd, fontSize: 14, marginTop: 8, fontStyle: "italic" }}>"{interim}"</p>}
             <p style={{ color: C.muted, fontSize: 12, marginTop: 12, textAlign: "center", lineHeight: 1.5 }}>AI mediates between you and the case.<br />Speak naturally — your words are relayed.</p>
           </div>
         ) : (
@@ -1137,8 +1236,11 @@ function S15({ go }) {
               </button>
             </>
           ) : (
-            <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + C.border, textAlign: "center" }}>
-              <span style={{ color: C.muted, fontSize: 13 }}>Listening... speak to AI mediator</span>
+            <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + (listening ? C.yd : C.border), textAlign: "center", background: listening ? C.yd + "22" : "transparent", transition: "all 0.3s" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: 999, background: listening ? C.yd : C.light }} />
+                <span style={{ color: listening ? C.yd : C.muted, fontSize: 13 }}>{listening ? (interim || "Speak to AI mediator...") : "Starting mic..."}</span>
+              </div>
             </div>
           )}
           <button onClick={() => go("s16")} style={{ padding: "0 16px", height: 42, borderRadius: 14, background: C.yp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
