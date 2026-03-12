@@ -1,4 +1,21 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+
+function haptic(style) {
+  if (navigator.vibrate) navigator.vibrate(style === "heavy" ? 30 : 10);
+}
+
+function useSwipe(onLeft, onRight) {
+  const touch = useRef(null);
+  var onStart = useCallback((e) => { touch.current = e.touches[0].clientX; }, []);
+  var onEnd = useCallback((e) => {
+    if (touch.current === null) return;
+    var diff = e.changedTouches[0].clientX - touch.current;
+    touch.current = null;
+    if (diff > 50) onRight();
+    else if (diff < -50) onLeft();
+  }, [onLeft, onRight]);
+  return { onTouchStart: onStart, onTouchEnd: onEnd };
+}
 
 const C = {
   purple: "#816FE8",
@@ -27,7 +44,7 @@ function Btn({ children, onClick, primary = true, disabled, style }) {
   return (
     <button
       disabled={disabled}
-      onClick={onClick}
+      onClick={(e) => { haptic(primary ? "heavy" : undefined); if (onClick) onClick(e); }}
       style={{
         width: "100%", padding: "16px 20px", borderRadius: 14,
         fontWeight: 600, fontSize: 16, cursor: disabled ? "default" : "pointer",
@@ -233,6 +250,9 @@ function S1({ go }) {
     "Connect to a test energy healer, 100% remotely and anonymously.",
     "Rate your symptoms in real time during your session.",
   ];
+  var next = useCallback(() => { setSlide((s) => (s + 1) % slides.length); haptic(); }, []);
+  var prev = useCallback(() => { setSlide((s) => (s - 1 + slides.length) % slides.length); haptic(); }, []);
+  var swipe = useSwipe(next, prev);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
       <Hdr onBack={() => {}} />
@@ -241,15 +261,15 @@ function S1({ go }) {
         <h1 style={{ fontSize: 28, fontWeight: 900, color: C.black, lineHeight: 1.15, margin: 0, fontFamily: ff }}>Your energy healing journey begins here</h1>
       </div>
       <div style={{ flex: 1, padding: "12px 24px", display: "flex", flexDirection: "column" }}>
-        <div style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.pd, boxShadow: "0 4px 24px rgba(100,80,200,0.15)" }}>
+        <div {...swipe} style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.pd, boxShadow: "0 4px 24px rgba(100,80,200,0.15)" }}>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
-            <button onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
+            <button onClick={prev} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
             <div style={{ background: C.black, borderRadius: 999, padding: "6px 14px", display: "flex", gap: 8 }}>
               {slides.map((_, i) => (
                 <div key={i} style={{ width: i === slide ? 20 : 8, height: 8, borderRadius: 999, background: i === slide ? C.white : "rgba(255,255,255,0.3)", transition: "all 0.3s" }} />
               ))}
             </div>
-            <button onClick={() => setSlide((s) => (s + 1) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
+            <button onClick={next} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
           </div>
           <p style={{ fontSize: 18, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.5, margin: "0 0 16px", fontFamily: ff, minHeight: 54 }}>{slides[slide]}</p>
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -836,6 +856,9 @@ function S12({ go }) {
     "Ennie makes energy healing accessible to anyone, anywhere.",
     "We securely connect test energy healers and users, protecting your data and privacy and conducting testing to ensure our test energy healers remain effective based on user feedback.",
   ];
+  var next = useCallback(() => { setSlide((s) => (s + 1) % slides.length); haptic(); }, []);
+  var prev = useCallback(() => { setSlide((s) => (s - 1 + slides.length) % slides.length); haptic(); }, []);
+  var swipe = useSwipe(next, prev);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
       <Hdr onBack={() => go("s1")} />
@@ -844,15 +867,15 @@ function S12({ go }) {
         <h1 style={{ fontSize: 28, fontWeight: 900, color: C.black, lineHeight: 1.15, margin: 0, fontFamily: ff }}>Energy healing begins here</h1>
       </div>
       <div style={{ flex: 1, padding: "12px 24px", display: "flex", flexDirection: "column" }}>
-        <div style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.yd, boxShadow: "0 4px 24px rgba(200,180,40,0.15)" }}>
+        <div {...swipe} style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.yd, boxShadow: "0 4px 24px rgba(200,180,40,0.15)" }}>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
-            <button onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
+            <button onClick={prev} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
             <div style={{ background: C.black, borderRadius: 999, padding: "6px 14px", display: "flex", gap: 8 }}>
               {slides.map((_, i) => (
                 <div key={i} style={{ width: i === slide ? 20 : 8, height: 8, borderRadius: 999, background: i === slide ? C.white : "rgba(255,255,255,0.3)", transition: "all 0.3s" }} />
               ))}
             </div>
-            <button onClick={() => setSlide((s) => (s + 1) % slides.length)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
+            <button onClick={next} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
           </div>
           <p style={{ fontSize: 16, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.5, margin: "0 0 16px", fontFamily: ff, minHeight: 54 }}>{slides[slide]}</p>
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
