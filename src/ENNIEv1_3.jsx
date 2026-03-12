@@ -1,6 +1,41 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { speak, stopSpeaking, createListener, isSTTAvailable } from "./tts.js";
 
+/* ===== ENNIE ICON SYSTEM ===== */
+function Ico({ name, size, color }) {
+  var s = size || 20;
+  var c = color || "currentColor";
+  var sw = s <= 16 ? "1.5" : "1.75";
+  var paths = {
+    hands: <><path d="M7.5 15.5C6 12 4.5 10.5 3.5 8c-.4-1 .3-2 1.3-1.2.8.7 1.5 2 2.2 3.7" /><path d="M8 10c-.4-2-1-3.5-1.5-5.2-.3-1 .7-1.6 1.2-.5.8 1.8 1.5 3.8 2 5.7" /><path d="M10.5 10c.1-2 .3-4 .2-5.5-.1-1.2 1-1.5 1.2-.2.2 1.8.2 4 .2 5.7" /><path d="M13 10c.2-1.8.4-3.2.6-4.5.2-1.2 1.3-1 1.1.2-.2 1.5-.5 3-.8 4.8" /><path d="M14.5 10.5c.5-.8 1.2-1.6 1.8-2 .7-.5 1 .1.5.8-.6 1-1.5 2-2.3 2.7" /><path d="M7.5 15.5c.3-1.5.8-3 1.8-4.5M14.5 12c-.3.8-1 2-2 3.5H7.5" /></>,
+    home: <><path d="M4 11.5L12 4.5l8 7" /><path d="M6 10v8.5c0 .3.2.5.5.5H10v-4.5h4V19h3.5c.3 0 .5-.2.5-.5V10" /></>,
+    chart: <><path d="M4 20V13c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v7" /><path d="M10 20V8c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v12" /><path d="M16 20V5c0-.6.4-1 1-1h2c.6 0 1 .4 1 1v15" /><line x1="2" y1="20" x2="22" y2="20" /></>,
+    gear: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></>,
+    mail: <><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" /><path d="M3 7l9 6 9-6" /></>,
+    mic: <><path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z" /><path d="M19 10v1a7 7 0 01-14 0v-1" /><line x1="12" y1="19" x2="12" y2="22" /><line x1="8" y1="22" x2="16" y2="22" /></>,
+    lock: <><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /><circle cx="12" cy="16" r="1" /></>,
+    arrow: <><line x1="5" y1="12" x2="19" y2="12" /><polyline points="13 6 19 12 13 18" /></>,
+    close: <><line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" /></>,
+    check: <><polyline points="4 12 9 17 20 6" /></>,
+    star: <><path d="M12 3l2.5 5.5L20 9.5l-4 4 1 5.5L12 16.5 7 19l1-5.5-4-4 5.5-1z" /></>,
+    bolt: <><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" /></>,
+    bell: <><path d="M18 8A6 6 0 006 8c0 3.5-1.5 6-3 7.5h18C19.5 14 18 11.5 18 8z" /><path d="M13.73 21a2 2 0 01-3.46 0" /></>,
+    send: <><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4z" /></>,
+    info: <><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></>,
+    clock: <><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></>,
+    shield: <><path d="M12 2l8 4v6c0 5.5-3.8 8.2-8 10-4.2-1.8-8-4.5-8-10V6z" /></>,
+    heart: <><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1.1L12 21.3l7.8-7.8 1-1.1a5.5 5.5 0 000-7.8z" /></>,
+    user: <><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></>,
+    activity: <><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></>,
+    pulse: <><path d="M2 12h4l3 9 6-18 3 9h4" /></>,
+  };
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+      {paths[name] || paths.star}
+    </svg>
+  );
+}
+
 function haptic(style) {
   if (navigator.vibrate) navigator.vibrate(style === "heavy" ? 30 : 10);
 }
@@ -266,7 +301,7 @@ function CRing({ seconds, total, size = 56 }) {
 }
 
 function TabBar({ go, active }) {
-  var items = [["🏠", "Home", "s21"], ["📊", "Activity", "s22"], ["⚙️", "Settings", "s20"]];
+  var items = [["home", "Home", "s21"], ["chart", "Activity", "s22"], ["gear", "Settings", "s20"]];
   return (
     <div style={{ display: "flex", background: C.white, borderTop: "1px solid " + C.borderLight, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
       {items.map(function (item) {
@@ -274,7 +309,7 @@ function TabBar({ go, active }) {
         return (
           <div key={item[1]} onClick={() => { haptic(); go(item[2]); }} style={{ flex: 1, textAlign: "center", padding: "10px 0 8px", cursor: "pointer", transition: "all 0.2s" }}>
             <div style={{ width: 28, height: 28, borderRadius: 10, background: isActive ? C.pd + "15" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 2px", transition: "background 0.2s" }}>
-              <span style={{ fontSize: 17 }}>{item[0]}</span>
+              <Ico name={item[0]} size={18} color={isActive ? C.pd : C.muted} />
             </div>
             <p style={{ fontSize: 10, color: isActive ? C.pd : C.muted, fontWeight: isActive ? 700 : 500, margin: 0, letterSpacing: 0.2, fontFamily: ff }}>{item[1]}</p>
           </div>
@@ -324,9 +359,9 @@ function HandArt({ style }) {
 function S1({ go }) {
   const [slide, setSlide] = useState(0);
   var slides = [
-    { text: "Ennie is built by world-renowned energy healer Charlie Goldsmith.", icon: "🤲" },
-    { text: "Connect to a test energy healer, 100% remotely and anonymously.", icon: "🔒" },
-    { text: "Rate your symptoms in real time during your session.", icon: "📊" },
+    { text: "Ennie is built by world-renowned energy healer Charlie Goldsmith.", icon: "hands" },
+    { text: "Connect to a test energy healer, 100% remotely and anonymously.", icon: "lock" },
+    { text: "Rate your symptoms in real time during your session.", icon: "chart" },
   ];
   var next = useCallback(() => { setSlide((s) => (s + 1) % slides.length); haptic(); }, []);
   var prev = useCallback(() => { setSlide((s) => (s - 1 + slides.length) % slides.length); haptic(); }, []);
@@ -336,7 +371,7 @@ function S1({ go }) {
       <div style={{ padding: "24px 24px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
           <div style={{ width: 38, height: 38, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ fontSize: 18 }}>🤲</span>
+            <Ico name="hands" size={20} color={C.pd} />
           </div>
           <span style={{ fontWeight: 800, fontSize: 20, color: C.white, fontFamily: ff, letterSpacing: -0.5 }}>Ennie™</span>
         </div>
@@ -352,7 +387,7 @@ function S1({ go }) {
           </div>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ width: 60, height: 60, borderRadius: 18, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-              <span style={{ fontSize: 28 }}>{slides[slide].icon}</span>
+              <Ico name={slides[slide].icon} size={28} color={C.pd} />
             </div>
             <p style={{ fontSize: 17, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.55, margin: "0 0 20px", fontFamily: ff, minHeight: 54 }}>{slides[slide].text}</p>
           </div>
@@ -393,7 +428,7 @@ function S2({ go }) {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
               <div style={{ width: 80, height: 80, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ fontSize: 40 }}>✉️</span>
+                <Ico name="mail" size={36} color={C.pd} />
               </div>
               <h3 style={{ color: C.black, fontWeight: 800, fontSize: 22, fontFamily: ff }}>Check your email</h3>
               <p style={{ color: C.muted, fontSize: 15, textAlign: "center" }}>Magic link sent to<br /><strong style={{ color: C.black }}>{email}</strong></p>
@@ -576,7 +611,7 @@ function S4({ go, setIntakeData }) {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, flex: 1 }}>
             <p style={{ fontSize: 22, fontWeight: 700, color: C.black, marginBottom: 24, fontFamily: ff }}>{listening ? "Listening..." : "Starting mic..."}</p>
             <div style={{ width: 140, height: 140, borderRadius: 999, background: listening ? C.pp : C.border, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s", animation: listening ? "pulse 2s infinite" : "none" }}>
-              <span style={{ fontSize: 24, opacity: listening ? 1 : 0.4 }}>🎙</span>
+              <Ico name="mic" size={24} color={listening ? C.pd : C.muted} />
             </div>
             {interim && <p style={{ color: C.muted, fontSize: 14, marginTop: 16, fontStyle: "italic", fontFamily: ff }}>{interim}</p>}
           </div>
@@ -629,10 +664,10 @@ function S4({ go, setIntakeData }) {
 function S6({ go }) {
   const [sel, setSel] = useState(null);
   var tiers = [
-    { id: 0, name: "Free", price: "FREE", wait: "~3 mins", rate: "40%", detail: "50% reduction", type: "Test healer", icon: "🤲" },
-    { id: 1, name: "Standard", price: "$50", wait: "~4 weeks", rate: "70%", detail: "90% reduction", type: "Qualified", icon: "⭐", badge: "Best value" },
-    { id: 2, name: "Priority", price: "$150", wait: "~7 days", rate: "70%", detail: "90% reduction", type: "Qualified", icon: "⚡", badge: "Popular" },
-    { id: 3, name: "Immediate", price: "$350", wait: "~10 mins", rate: "70%", detail: "90% reduction", type: "Qualified", icon: "✨", badge: "Fastest" },
+    { id: 0, name: "Free", price: "FREE", wait: "~3 mins", rate: "40%", detail: "50% reduction", type: "Test healer", icon: "hands" },
+    { id: 1, name: "Standard", price: "$50", wait: "~4 weeks", rate: "70%", detail: "90% reduction", type: "Qualified", icon: "star", badge: "Best value" },
+    { id: 2, name: "Priority", price: "$150", wait: "~7 days", rate: "70%", detail: "90% reduction", type: "Qualified", icon: "bolt", badge: "Popular" },
+    { id: 3, name: "Immediate", price: "$350", wait: "~10 mins", rate: "70%", detail: "90% reduction", type: "Qualified", icon: "star", badge: "Fastest" },
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
@@ -650,7 +685,7 @@ function S6({ go }) {
             <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: C.white, borderRadius: 20, padding: "18px 18px", cursor: "pointer", position: "relative", border: isSel ? "2px solid " + C.pd : "1px solid " + C.borderLight, transition: "all 0.2s" }}>
               {t.badge && <span style={{ position: "absolute", top: -9, right: 18, fontSize: 10, fontWeight: 700, background: C.black, color: C.white, padding: "3px 12px", borderRadius: 999 }}>{t.badge}</span>}
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 14, background: t.id === 0 ? C.pp : C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{t.icon}</div>
+                <div style={{ width: 42, height: 42, borderRadius: 14, background: t.id === 0 ? C.pp : C.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Ico name={t.icon} size={20} color={C.pd} /></div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <span style={{ fontSize: 17, fontWeight: 800, color: C.black, fontFamily: ff }}>{t.name}</span>
@@ -697,7 +732,7 @@ function SQueue({ go }) {
       <div style={{ flex: 1, padding: "0 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
           <div style={{ width: 72, height: 72, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-            <span style={{ fontSize: 36 }}>⏳</span>
+            <Ico name="clock" size={32} color={C.pd} />
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, margin: "0 0 8px", fontFamily: ff }}>You're in the queue</h2>
           <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Approx 10–20 mins</p>
@@ -717,7 +752,7 @@ function S7({ go }) {
       <div style={{ flex: 1, padding: "60px 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
           <div style={{ width: 72, height: 72, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-            <span style={{ fontSize: 36 }}>✨</span>
+            <Ico name="star" size={32} color={C.pd} />
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, margin: "0 0 8px", fontFamily: ff }}>It's nearly your turn</h2>
           <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Are you ready to begin?</p>
@@ -1013,7 +1048,7 @@ function S10({ go }) {
       <div style={{ flex: 1, padding: "40px 20px 32px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
           <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <span style={{ fontSize: 28 }}>✨</span>
+            <Ico name="star" size={26} color={C.pd} />
           </div>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, margin: "0 0 6px", fontFamily: ff }}>Session complete</h2>
           <p style={{ color: C.muted, fontSize: 14, margin: "0 0 20px" }}>Thank you for your session. Here's how your symptoms changed.</p>
@@ -1053,7 +1088,7 @@ function S10({ go }) {
           {!thx ? (
             <Btn primary={false} onClick={() => setThx(true)} style={{ marginBottom: 10 }}>Send anonymous thank you</Btn>
           ) : (
-            <p style={{ color: C.green, fontWeight: 600, fontSize: 14 }}>✓ Thank you sent</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><Ico name="check" size={16} color={C.green} /><span style={{ color: C.green, fontWeight: 600, fontSize: 14 }}>Thank you sent</span></div>
           )}
           <Btn onClick={() => go("s21")}>Return home</Btn>
         </WCard>
@@ -1071,7 +1106,7 @@ function S11({ go }) {
       <div style={{ flex: 1, padding: "40px 20px 32px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
           <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <span style={{ fontSize: 28 }}>🔔</span>
+            <Ico name="bell" size={26} color={C.pd} />
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 6px", fontFamily: ff }}>24-Hour Follow-up</h2>
           <p style={{ color: C.muted, fontSize: 14, margin: "0 0 20px" }}>It's been 24 hours since your session. How are your symptoms now?</p>
@@ -1103,7 +1138,7 @@ function S11({ go }) {
           ) : (
             <>
               <div style={{ width: 60, height: 60, borderRadius: 999, background: C.green + "22", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                <span style={{ fontSize: 28, color: C.green }}>✓</span>
+                <Ico name="check" size={26} color={C.green} />
               </div>
               <p style={{ color: C.green, fontWeight: 700, fontSize: 16, margin: "0 0 8px" }}>Thank you!</p>
               <p style={{ color: C.muted, fontSize: 14, margin: "0 0 20px" }}>Your feedback helps improve our healers and your future sessions.</p>
@@ -1388,7 +1423,7 @@ function S16({ go }) {
       <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
         <WCard>
           <div style={{ width: 60, height: 60, borderRadius: 999, background: C.yp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-            <span style={{ fontSize: 28 }}>✨</span>
+            <Ico name="star" size={26} color={C.pd} />
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 6px", textAlign: "center", fontFamily: ff }}>Session complete</h2>
           <p style={{ color: C.muted, fontSize: 14, textAlign: "center", margin: "0 0 20px" }}>Here's how the case responded</p>
@@ -1430,9 +1465,9 @@ function S16({ go }) {
 function S17({ go }) {
   const [sel, setSel] = useState(null);
   var tiers = [
-    { id: 0, name: "Standard", price: "$50", per: "per session", wait: "~4 weeks", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "🤲" },
-    { id: 1, name: "Priority", price: "$150", per: "per session", wait: "~7 days", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "⚡", badge: "Most popular" },
-    { id: 2, name: "Immediate", price: "$350", per: "per session", wait: "~10 mins", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "✨", badge: "Fastest" },
+    { id: 0, name: "Standard", price: "$50", per: "per session", wait: "~4 weeks", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "hands" },
+    { id: 1, name: "Priority", price: "$150", per: "per session", wait: "~7 days", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "bolt", badge: "Most popular" },
+    { id: 2, name: "Immediate", price: "$350", per: "per session", wait: "~10 mins", rate: "70%", detail: "90% avg reduction", type: "Qualified healer", icon: "star", badge: "Fastest" },
   ];
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
@@ -1448,7 +1483,7 @@ function S17({ go }) {
             <div key={t.id} onClick={() => { haptic(); setSel(t.id); }} style={{ background: C.white, borderRadius: 22, padding: "22px 20px", cursor: "pointer", position: "relative", border: isSel ? "2.5px solid " + C.pd : "1.5px solid " + C.border, boxShadow: isSel ? "0 6px 24px rgba(107,91,212,0.2)" : "0 2px 12px rgba(0,0,0,0.04)", transition: "all 0.25s ease", transform: isSel ? "scale(1.02)" : "scale(1)" }}>
               {t.badge && <span style={{ position: "absolute", top: -10, right: 20, fontSize: 11, fontWeight: 700, background: t.id === 2 ? C.pd : C.black, color: C.white, padding: "4px 14px", borderRadius: 999, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>{t.badge}</span>}
               <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 14, background: t.id === 2 ? C.pp : C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{t.icon}</div>
+                <div style={{ width: 44, height: 44, borderRadius: 14, background: t.id === 2 ? C.pp : C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}><Ico name={t.icon} size={22} color={C.pd} /></div>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: 18, fontWeight: 800, color: C.black, fontFamily: ff, display: "block" }}>{t.name}</span>
                   <span style={{ fontSize: 12, color: C.muted }}>{t.type}</span>
@@ -1607,7 +1642,7 @@ function S21({ go }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 12, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 16 }}>🤲</span>
+              <Ico name="hands" size={18} color={C.pd} />
             </div>
             <span style={{ fontWeight: 800, fontSize: 18, color: C.white, fontFamily: ff, letterSpacing: -0.3 }}>Ennie™</span>
           </div>
@@ -1618,10 +1653,10 @@ function S21({ go }) {
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px 8px" }}>
         <div style={{ display: "flex", gap: 10, marginBottom: 16, overflowX: "auto", paddingBottom: 4 }}>
-          {[{ t: "Unlimited free sessions with test healers", icon: "✨" }, { t: "Rate symptoms in real time", icon: "📊" }].map((item, i) => (
+          {[{ t: "Unlimited free sessions with test healers", icon: "star" }, { t: "Rate symptoms in real time", icon: "chart" }].map((item, i) => (
             <div key={i} style={{ minWidth: 185, background: C.white, borderRadius: 20, padding: "18px 16px", border: "1px solid " + C.borderLight }}>
               <div style={{ width: 36, height: 36, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-                <span style={{ fontSize: 16 }}>{item.icon}</span>
+                <Ico name={item.icon} size={18} color={C.pd} />
               </div>
               <p style={{ fontSize: 13, color: C.black, margin: 0, lineHeight: 1.45, fontWeight: 500 }}>{item.t}</p>
             </div>
@@ -1633,17 +1668,17 @@ function S21({ go }) {
             <p style={{ fontSize: 13, color: C.pp, margin: 0 }}>Free with test healers</p>
           </div>
           <div style={{ width: 42, height: 42, borderRadius: 14, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ fontSize: 18, color: C.white }}>→</span>
+            <Ico name="arrow" size={18} color={C.white} />
           </div>
         </div>
         <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
           <div onClick={() => go("s19")} style={{ flex: 1, background: C.white, borderRadius: 18, padding: "16px 14px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
-            <span style={{ fontSize: 20, display: "block", marginBottom: 8 }}>✨</span>
+            <div style={{ marginBottom: 8 }}><Ico name="star" size={20} color={C.pd} /></div>
             <p style={{ fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: ff }}>How it works</p>
             <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>Learn about Ennie</p>
           </div>
           <div onClick={() => go("s17")} style={{ flex: 1, background: C.white, borderRadius: 18, padding: "16px 14px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
-            <span style={{ fontSize: 20, display: "block", marginBottom: 8 }}>⚡</span>
+            <div style={{ marginBottom: 8 }}><Ico name="bolt" size={20} color={C.pd} /></div>
             <p style={{ fontSize: 14, fontWeight: 700, margin: "0 0 2px", fontFamily: ff }}>Paid sessions</p>
             <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>Skip the queue</p>
           </div>
@@ -1661,7 +1696,7 @@ function S19({ go }) {
       <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
           <div style={{ width: 100, height: 100, borderRadius: 999, background: C.pl, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", border: "3px solid " + C.pd }}>
-            <span style={{ fontSize: 44 }}>🤲</span>
+            <Ico name="hands" size={40} color={C.pd} />
           </div>
           <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Charlie Goldsmith</h2>
           <p style={{ color: C.pd, fontSize: 13, fontWeight: 600, margin: "0 0 16px" }}>World-renowned energy healer</p>
@@ -1753,7 +1788,7 @@ function S23({ go }) {
             <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.6, marginBottom: 20 }}>What you'll lose:</p>
             {["All session history and symptom data", "Your queue position and preferences", "Any remaining paid session credits"].map((item, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <span style={{ color: C.red, fontSize: 14 }}>✕</span>
+                <Ico name="close" size={12} color={C.red} />
                 <span style={{ fontSize: 14, color: C.black }}>{item}</span>
               </div>
             ))}
@@ -1912,7 +1947,7 @@ export default function ENNIEv1_3() {
         <span style={{ fontWeight: 800, fontSize: 14, color: C.pd }}>Ennie™</span>
         <span style={{ color: C.muted, fontSize: 12, flex: 1, textAlign: "center" }}>{label}</span>
         <button onClick={() => setNav((n) => !n)} style={{ color: C.black, fontSize: 12, background: C.white, border: "1.5px solid " + C.border, borderRadius: 10, padding: "5px 14px", cursor: "pointer", fontFamily: ff, fontWeight: 600 }}>
-          {nav ? "✕ Close" : "☰ All"}
+          {nav ? "Close" : "All screens"}
         </button>
       </div>
       <div style={{ position: "relative", width: 390, height: 844, borderRadius: 48, overflow: "hidden", boxShadow: "0 20px 60px rgba(120,100,180,0.25)", border: "1px solid " + C.border }}>
