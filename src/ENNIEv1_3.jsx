@@ -192,7 +192,7 @@ function CRing({ seconds, total, size = 56 }) {
 }
 
 function TabBar({ go, active }) {
-  var items = [["🏠", "Home", "s21"], ["⊞", "Activity", "s21"], ["⚙️", "Settings", "s20"]];
+  var items = [["🏠", "Home", "s21"], ["⊞", "Activity", "s22"], ["⚙️", "Settings", "s20"]];
   return (
     <div style={{ display: "flex", borderTop: "1px solid " + C.border, background: C.white }}>
       {items.map(function (item) {
@@ -1374,6 +1374,46 @@ function S20({ go }) {
   );
 }
 
+function S22({ go }) {
+  var sessions = [
+    { date: "Today", time: "2:30 PM", healer: "Test Healer A7Q2", type: "Free", status: "Completed", areas: [["Neck", 7, 3], ["Back", 5, 2]] },
+    { date: "Yesterday", time: "11:00 AM", healer: "Test Healer B3K1", type: "Free", status: "Completed", areas: [["Shoulder", 6, 4]] },
+    { date: "Mar 9", time: "4:15 PM", healer: "Test Healer A7Q2", type: "Free", status: "Completed", areas: [["Neck", 8, 5], ["Back", 6, 3]] },
+  ];
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
+      <div style={{ background: C.purple, padding: "16px 24px 24px", borderRadius: "0 0 24px 24px" }}>
+        <h2 style={{ color: C.black, fontWeight: 800, fontSize: 22, margin: "0 0 4px", fontFamily: ff }}>Activity</h2>
+        <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>{sessions.length} sessions completed</p>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px" }}>
+        {sessions.map((s, i) => (
+          <div key={i} style={{ background: C.bg, borderRadius: 16, padding: 16, marginBottom: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: C.black, fontFamily: ff }}>{s.date} · {s.time}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: C.green, background: C.green + "18", padding: "2px 10px", borderRadius: 999 }}>{s.status}</span>
+            </div>
+            <p style={{ fontSize: 13, color: C.muted, margin: "0 0 8px" }}>{s.healer} · {s.type}</p>
+            <div style={{ display: "flex", gap: 8 }}>
+              {s.areas.map(([label, before, after]) => (
+                <div key={label} style={{ background: C.white, borderRadius: 10, padding: "8px 12px", flex: 1 }}>
+                  <p style={{ color: C.muted, fontSize: 11, margin: "0 0 2px" }}>{label}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ color: C.muted, fontSize: 14 }}>{before}</span>
+                    <span style={{ color: C.light, fontSize: 10 }}>→</span>
+                    <span style={{ color: C.green, fontWeight: 800, fontSize: 16 }}>{after}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <TabBar go={go} active="Activity" />
+    </div>
+  );
+}
+
 function S21({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
@@ -1436,12 +1476,13 @@ var SCREENS = {
   s18: { comp: S18, label: "18. Payment" },
   s20: { comp: S20, label: "20. Settings" },
   s21: { comp: S21, label: "21. Home" },
+  s22: { comp: S22, label: "22. Activity" },
 };
 
 var GROUPS = [
   { title: "Case Journey", keys: ["s1", "sLogin", "s2", "s3", "s4", "s6", "sq", "s7", "s8", "s9", "s10"] },
   { title: "Healer", keys: ["s12", "sHReg", "sHLogin", "s13", "s14", "s15", "s16"] },
-  { title: "Other", keys: ["s17", "s18", "s20", "s21"] },
+  { title: "Other", keys: ["s17", "s18", "s20", "s21", "s22"] },
 ];
 
 export default function ENNIEv1_3() {
