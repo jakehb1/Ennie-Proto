@@ -4,45 +4,9 @@ const VOICE_ID = "IKosFDmvNlCwcgcWNJ1r"; // Charlie
 let currentAudio = null;
 let queue = [];
 let playing = false;
-let useElevenLabs = !!API_KEY; // will flip to false if ElevenLabs fails
-
-// Pick a nice female voice for browser fallback
-function getBrowserVoice() {
-  if (typeof window === "undefined" || !window.speechSynthesis) return null;
-  var voices = window.speechSynthesis.getVoices();
-  // Prefer: Samantha (Mac), Google UK English Female, any female en voice
-  var pick = voices.find(v => v.name.includes("Samantha"))
-    || voices.find(v => v.name.includes("Google UK English Female"))
-    || voices.find(v => v.name.includes("Google US English"))
-    || voices.find(v => v.lang.startsWith("en") && v.name.toLowerCase().includes("female"))
-    || voices.find(v => v.lang.startsWith("en"))
-    || null;
-  return pick;
-}
-
-// Preload voices (some browsers need this)
-if (typeof window !== "undefined" && window.speechSynthesis) {
-  window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-}
-
-function speakBrowser(text) {
-  if (typeof window === "undefined" || !window.speechSynthesis) return Promise.resolve();
-  return new Promise((resolve) => {
-    window.speechSynthesis.cancel(); // clear any pending
-    var utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 0.95;
-    utt.pitch = 1.05;
-    var voice = getBrowserVoice();
-    if (voice) utt.voice = voice;
-    utt.onend = resolve;
-    utt.onerror = resolve;
-    window.speechSynthesis.speak(utt);
-  });
-}
 
 export async function speak(text) {
-  if (!text) return;
+  if (!API_KEY || !text) return;
   queue.push(text);
   if (!playing) processQueue();
 }
@@ -54,9 +18,6 @@ export function stopSpeaking() {
     currentAudio.pause();
     currentAudio = null;
   }
-  if (typeof window !== "undefined" && window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
 }
 
 async function processQueue() {
@@ -64,53 +25,46 @@ async function processQueue() {
   playing = true;
   const text = queue.shift();
 
-  // Try ElevenLabs first
-  if (useElevenLabs && API_KEY) {
-    try {
-      const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": API_KEY,
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "xi-api-key": API_KEY,
+      },
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_monolingual_v1",
+        voice_settings: {
+          stability: 0.6,
+          similarity_boost: 0.75,
         },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_monolingual_v1",
-          voice_settings: {
-            stability: 0.6,
-            similarity_boost: 0.75,
-          },
-        }),
-      });
+      }),
+    });
 
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        currentAudio = new Audio(url);
-        await new Promise((resolve) => {
-          currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-          currentAudio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-          currentAudio.play().catch(resolve);
-        });
-        processQueue();
-        return;
-      }
-      // ElevenLabs failed — fall through to browser TTS
-      console.warn("ElevenLabs TTS error:", res.status, "— falling back to browser voice");
-      useElevenLabs = false;
-    } catch (err) {
-      console.warn("ElevenLabs unreachable — falling back to browser voice:", err.message);
-      useElevenLabs = false;
+    if (!res.ok) {
+      console.warn("ElevenLabs TTS error:", res.status);
+      processQueue();
+      return;
     }
-  }
 
-  // Browser SpeechSynthesis fallback (always available, free)
-  await speakBrowser(text);
-  processQueue();
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+    await new Promise((resolve) => {
+      currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+      currentAudio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+      currentAudio.play().catch(resolve);
+    });
+    processQueue();
+  } catch (err) {
+    console.warn("ElevenLabs TTS fetch failed:", err);
+    processQueue();
+  }
 }
 
 export function isTTSAvailable() {
-  return !!(API_KEY || (typeof window !== "undefined" && window.speechSynthesis));
+  return !!API_KEY;
 }
 
 // --- Speech Recognition (STT) ---
@@ -149,7 +103,6 @@ export function createListener(onResult, onStateChange) {
 
   rec.onend = () => {
     if (active) {
-      // Auto-restart if still supposed to be listening
       try { rec.start(); } catch (_) {}
     } else {
       if (onStateChange) onStateChange({ listening: false, interim: "" });
