@@ -305,7 +305,7 @@ function S2({ go }) {
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
         <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
         <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female", "Non-binary", "Prefer not to say"]} style={{ marginBottom: 20 }} />
+        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female"]} style={{ marginBottom: 20 }} />
         <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
         <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
         <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
@@ -885,7 +885,7 @@ function SHReg({ go }) {
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
         <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
         <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female", "Non-binary", "Prefer not to say"]} style={{ marginBottom: 20 }} />
+        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female"]} style={{ marginBottom: 20 }} />
         <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
         <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
         <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
