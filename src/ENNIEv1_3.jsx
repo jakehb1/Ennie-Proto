@@ -197,9 +197,12 @@ function WaveBars({ count, maxH, active, color, frame }) {
 function S1({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple, padding: "20px 28px 32px" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <button onClick={() => go("s2")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 14, color: C.black, opacity: 0.7, textDecoration: "underline" }}>Login</button>
+      </div>
       <div style={{ marginBottom: "auto" }}>
-        <h1 style={{ fontSize: 44, fontWeight: 900, color: C.black, lineHeight: 1.02, margin: "0 0 10px", fontFamily: ff }}>Welcome<br />to Ennie</h1>
-        <p style={{ color: C.black, fontSize: 17, margin: 0, opacity: 0.6 }}>Energy healing for everyone, anywhere.</p>
+        <h1 style={{ fontSize: 44, fontWeight: 900, color: C.black, lineHeight: 1.02, margin: "0 0 10px", fontFamily: ff }}>Welcome<br />to ENNIE</h1>
+        <p style={{ color: C.black, fontSize: 17, margin: 0, opacity: 0.6 }}>Energy healing for anyone, anywhere.</p>
       </div>
       <div style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
         <div style={{ width: 180, height: 180, borderRadius: 999, background: C.pl, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -209,7 +212,7 @@ function S1({ go }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div onClick={() => go("s2")} style={{ background: C.pl, borderRadius: 24, padding: "28px 24px", cursor: "pointer", position: "relative" }}>
           <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Suffering<br />from pain?</h2>
-          <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>Get started for free</p>
+          <p style={{ color: C.black, opacity: 0.6, fontSize: 14, margin: 0 }}>Get started for FREE</p>
           <span style={{ position: "absolute", right: 24, top: "50%", transform: "translateY(-50%)", fontSize: 24, color: C.black }}>→</span>
         </div>
         <Btn primary={false} onClick={() => go("s12")}>Join as a Test Energy Healer</Btn>
@@ -259,23 +262,44 @@ function S2({ go }) {
 
 function S3({ go }) {
   const [step, setStep] = useState(0);
+  const [dob, setDob] = useState({ day: "", month: "", year: "" });
+  const dobValid = dob.day && dob.month && dob.year && dob.year.length === 4;
+  const getAge = () => {
+    if (!dobValid) return 0;
+    var bd = new Date(Number(dob.year), Number(dob.month) - 1, Number(dob.day));
+    var diff = Date.now() - bd.getTime();
+    return Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
+  };
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr onBack={() => go("s2")} />
+      <Hdr onBack={() => step > 0 ? setStep(s => s - 1) : go("s2")} />
       <div style={{ flex: 1, padding: "0 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
           {step === 0 ? (
             <>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, lineHeight: 1.2, margin: "0 0 8px", fontFamily: ff }}>Date of birth</h2>
+              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>We need this to verify your age</p>
+              <div style={{ display: "flex", gap: 10, width: "100%", marginBottom: 16 }}>
+                <Inp value={dob.day} onChange={(e) => setDob(d => ({ ...d, day: e.target.value.replace(/\D/g, "").slice(0, 2) }))} placeholder="DD" style={{ flex: 1, textAlign: "center" }} />
+                <Inp value={dob.month} onChange={(e) => setDob(d => ({ ...d, month: e.target.value.replace(/\D/g, "").slice(0, 2) }))} placeholder="MM" style={{ flex: 1, textAlign: "center" }} />
+                <Inp value={dob.year} onChange={(e) => setDob(d => ({ ...d, year: e.target.value.replace(/\D/g, "").slice(0, 4) }))} placeholder="YYYY" style={{ flex: 2, textAlign: "center" }} />
+              </div>
+              <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.5, margin: "0 0 20px" }}>ENNIE is not a medical service. Energy healing is complementary — it does not replace professional medical advice, diagnosis, or treatment.</p>
+              <Btn disabled={!dobValid || getAge() < 13} onClick={() => setStep(1)}>{!dobValid ? "Enter your date of birth" : getAge() < 13 ? "You must be 13 or older" : "Continue"}</Btn>
+            </>
+          ) : step === 1 ? (
+            <>
               <div style={{ width: 48, height: 48, borderRadius: 999, border: "2px solid " + C.black, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
                 <span style={{ fontSize: 22, fontWeight: 700 }}>!</span>
               </div>
-              <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, lineHeight: 1.2, margin: "0 0 16px", fontFamily: ff }}>Are you in a medical emergency or require medical or psychological assistance?</h2>
-              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>Ennie is not suitable for emergencies. If you have severe symptoms, please consult a licensed healthcare provider or call your local emergency services.</p>
-              <Btn onClick={() => setStep(1)}>Not an emergency</Btn>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, lineHeight: 1.2, margin: "0 0 16px", fontFamily: ff }}>Are you in a medical emergency?</h2>
+              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>ENNIE is not suitable for emergencies. If you need urgent help, please call your local emergency services.</p>
+              <Btn onClick={() => setStep(2)}>No — not an emergency</Btn>
             </>
           ) : (
             <>
-              <h2 style={{ fontSize: 30, fontWeight: 800, color: C.black, margin: "0 0 28px", fontFamily: ff }}>Do you have symptoms now?</h2>
+              <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, margin: "0 0 12px", fontFamily: ff }}>Do you have active symptoms right now?</h2>
+              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>Free sessions require symptoms you can rate in real time during the session.</p>
               <div style={{ display: "flex", gap: 12, width: "100%" }}>
                 <Btn primary={false} onClick={() => go("s17")} style={{ flex: 1 }}>No</Btn>
                 <Btn onClick={() => go("s4")} style={{ flex: 1 }}>Yes</Btn>
@@ -411,9 +435,45 @@ function S6({ go }) {
         ))}
       </div>
       <div style={{ padding: "12px 20px 28px" }}>
-        <Btn disabled={sel === null} onClick={() => sel === 0 ? go("s7") : go("s18")}>
+        <Btn disabled={sel === null} onClick={() => sel === 0 ? go("sq") : go("s18")}>
           {sel === null ? "Select a tier" : sel === 0 ? "Join free queue →" : "Pay " + tiers[sel].price + " →"}
         </Btn>
+      </div>
+    </div>
+  );
+}
+
+function SQueue({ go }) {
+  const tips = [
+    "Find a quiet, comfortable spot",
+    "You'll be asked to rate your symptoms during the session",
+    "The session is anonymous — your healer won't know who you are",
+    "A real person will be working on you — not AI",
+  ];
+  const [tipIdx, setTipIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setTipIdx((i) => (i + 1) % tips.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+  useEffect(() => {
+    const t = setTimeout(() => go("s7"), 6000);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+      <Hdr onBack={() => go("s6")} />
+      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+        <WCard style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+          <div style={{ width: 72, height: 72, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <span style={{ fontSize: 36 }}>⏳</span>
+          </div>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, margin: "0 0 8px", fontFamily: ff }}>You're in the queue</h2>
+          <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Approx 10–20 mins</p>
+          <div style={{ background: C.pp, borderRadius: 16, padding: "16px 20px", marginBottom: 24, minHeight: 70, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <p style={{ color: C.pd, fontSize: 14, fontWeight: 600, margin: 0, lineHeight: 1.5 }}>{tips[tipIdx]}</p>
+          </div>
+          <Btn primary={false} onClick={() => go("s6")} style={{ color: C.red, borderColor: C.red }}>Leave queue</Btn>
+        </WCard>
       </div>
     </div>
   );
@@ -422,16 +482,15 @@ function S6({ go }) {
 function S7({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr onBack={() => go("s6")} />
-      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+      <div style={{ flex: 1, padding: "60px 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
           <div style={{ width: 72, height: 72, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
             <span style={{ fontSize: 36 }}>✨</span>
           </div>
-          <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, margin: "0 0 8px", fontFamily: ff }}>It's your turn</h2>
-          <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Ready to begin?</p>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, margin: "0 0 8px", fontFamily: ff }}>It's nearly your turn</h2>
+          <p style={{ color: C.muted, fontSize: 16, marginBottom: 28 }}>Are you ready to begin?</p>
           <Btn onClick={() => go("s8")} style={{ marginBottom: 10 }}>Yes, I'm ready</Btn>
-          <Btn primary={false} onClick={() => go("s6")}>Snooze — keep my spot</Btn>
+          <Btn primary={false} onClick={() => go("sq")}>Snooze — keep my spot</Btn>
         </WCard>
       </div>
     </div>
@@ -575,11 +634,15 @@ function S9({ go }) {
               </div>
               {sp === "healer" && <p style={{ color: C.muted, fontSize: 13, textAlign: "center", margin: "6px 0 0", fontStyle: "italic" }}>"{lastH}"</p>}
             </div>
-            <div style={{ padding: "10px 16px 20px", display: "flex", gap: 8 }}>
-              <div onClick={simV} style={{ flex: 1, padding: 14, borderRadius: 14, border: "1.5px solid " + C.border, textAlign: "center", cursor: "pointer" }}>
-                <span style={{ color: C.muted, fontSize: 13 }}>Tap to simulate voice</span>
+            <div style={{ padding: "10px 16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
+              <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 15, color: C.white }}>I feel a change</button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <div onClick={simV} style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + C.border, textAlign: "center", cursor: "pointer" }}>
+                  <span style={{ color: C.muted, fontSize: 13 }}>Simulate voice</span>
+                </div>
+                <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
+                <button style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
               </div>
-              <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.black }}>End</button>
             </div>
           </>
         ) : (
@@ -603,12 +666,18 @@ function S9({ go }) {
                 return <Bubble key={i} from={m.from} text={m.text} />;
               })}
             </div>
-            <div style={{ padding: "10px 14px 20px", borderTop: "1px solid " + C.border, display: "flex", gap: 8 }}>
-              <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Reply to your healer..." style={{ flex: 1, fontSize: 14, padding: 12 }} />
-              <button onClick={() => send()} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, border: "none", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ color: C.white, fontSize: 16 }}>↑</span>
-              </button>
-              <button onClick={() => go("s10")} style={{ padding: "0 14px", height: 42, borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 12, color: C.black }}>End</button>
+            <div style={{ padding: "10px 14px 20px", borderTop: "1px solid " + C.border, display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Inp value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Reply to your healer..." style={{ flex: 1, fontSize: 14, padding: 12 }} />
+                <button onClick={() => send()} style={{ width: 42, height: 42, borderRadius: 14, background: C.black, border: "none", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ color: C.white, fontSize: 16 }}>↑</span>
+                </button>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ flex: 1, padding: "10px 14px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 13, color: C.white }}>I feel a change</button>
+                <button onClick={() => go("s10")} style={{ padding: "0 14px", borderRadius: 14, background: C.pp, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 700, fontSize: 12, color: C.black }}>End</button>
+                <button style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 11, color: C.red }}>Help</button>
+              </div>
             </div>
           </>
         )}
@@ -618,30 +687,52 @@ function S9({ go }) {
 }
 
 function S10({ go }) {
-  var bef = { neck: 7, back: 5 };
-  var aft = { neck: 3, back: 2 };
+  var befPins = [{ x: 47, y: 22, side: "front", score: 7, label: "Neck" }, { x: 55, y: 38, side: "front", score: 5, label: "Back" }];
+  var aftPins = [{ x: 47, y: 22, side: "front", score: 3, label: "Neck" }, { x: 55, y: 38, side: "front", score: 2, label: "Back" }];
   const [thx, setThx] = useState(false);
+  const [feeling, setFeeling] = useState(null);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <div style={{ flex: 1, padding: "60px 20px 32px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "40px 20px 32px", overflowY: "auto" }}>
         <WCard style={{ textAlign: "center" }}>
           <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
             <span style={{ fontSize: 28 }}>✨</span>
           </div>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, margin: "0 0 20px", fontFamily: ff }}>Session complete</h2>
-          {Object.keys(bef).map((k) => (
-            <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid " + C.border + "22" }}>
-              <span style={{ fontWeight: 600, textTransform: "capitalize", fontSize: 15 }}>{k}</span>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, margin: "0 0 6px", fontFamily: ff }}>Session complete</h2>
+          <p style={{ color: C.muted, fontSize: 14, margin: "0 0 20px" }}>Thank you for your session. Here's how your symptoms changed.</p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 20, marginBottom: 16 }}>
+            <div style={{ textAlign: "center" }}>
+              <p style={{ color: C.muted, fontSize: 11, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase" }}>Before</p>
+              <BMap pins={befPins} readonly small />
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <p style={{ color: C.green, fontSize: 11, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase" }}>After</p>
+              <BMap pins={aftPins} readonly small />
+            </div>
+          </div>
+          {befPins.map((p, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid " + C.border + "22" }}>
+              <span style={{ fontWeight: 600, fontSize: 15 }}>{p.label}</span>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <span style={{ color: C.muted }}>{bef[k]}</span>
+                <span style={{ color: C.muted }}>{p.score}</span>
                 <span style={{ color: C.light }}>→</span>
-                <span style={{ color: C.green, fontWeight: 800, fontSize: 18 }}>{aft[k]}</span>
+                <span style={{ color: C.green, fontWeight: 800, fontSize: 18 }}>{aftPins[i].score}</span>
               </div>
             </div>
           ))}
-          <div style={{ background: C.pp, borderRadius: 14, padding: 14, margin: "16px 0", textAlign: "center" }}>
-            <p style={{ color: C.pd, fontSize: 14, fontStyle: "italic", margin: 0 }}>We'll check in with you in 24 hours.</p>
+          <div style={{ background: C.pp, borderRadius: 14, padding: 14, margin: "16px 0" }}>
+            <p style={{ color: C.pd, fontSize: 14, fontWeight: 600, margin: "0 0 8px" }}>How are you feeling overall?</p>
+            {!feeling ? (
+              <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                {["Much better", "A little better", "About the same"].map((f) => (
+                  <button key={f} onClick={() => setFeeling(f)} style={{ padding: "8px 12px", borderRadius: 12, border: "1.5px solid " + C.pd, background: C.white, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 600, color: C.pd }}>{f}</button>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: C.pd, fontSize: 13, margin: 0 }}>You said: <strong>{feeling}</strong></p>
+            )}
           </div>
+          <p style={{ color: C.muted, fontSize: 12, fontStyle: "italic", margin: "0 0 16px" }}>We'll check in with you in 24 hours.</p>
           {!thx ? (
             <Btn primary={false} onClick={() => setThx(true)} style={{ marginBottom: 10 }}>Send anonymous thank you</Btn>
           ) : (
@@ -712,7 +803,7 @@ function S13({ go }) {
               <div style={{ width: 22, height: 22, background: C.white, borderRadius: 999, position: "absolute", top: 3, left: on ? 27 : 3, transition: "all 0.3s" }} />
             </button>
           </div>
-          {on && <Btn onClick={() => go("s15")} style={{ marginTop: 14, fontSize: 14 }}>Simulate incoming case →</Btn>}
+          {on && <Btn onClick={() => go("s14")} style={{ marginTop: 14, fontSize: 14 }}>Simulate incoming case →</Btn>}
         </div>
         <div style={{ background: C.pp, borderRadius: 20, padding: 16, marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
@@ -738,6 +829,52 @@ function S13({ go }) {
   );
 }
 
+function S14({ go }) {
+  const [countdown, setCountdown] = useState(10);
+  useEffect(() => {
+    if (countdown <= 0) { go("s15"); return; }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [countdown]);
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+      <div style={{ padding: "8px 20px" }}><Tag>Healer view</Tag></div>
+      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+        <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 4px", fontFamily: ff }}>Incoming case</h2>
+          <p style={{ color: C.muted, fontSize: 13, margin: "0 0 16px" }}>Session starts in {countdown}s</p>
+          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+            <BMap pins={[{ x: 47, y: 22, side: "front", score: 7 }, { x: 55, y: 38, side: "front", score: 5 }]} readonly small />
+            <div style={{ flex: 1 }}>
+              <div style={{ background: C.pp, borderRadius: 12, padding: 12, marginBottom: 8 }}>
+                <p style={{ color: C.muted, fontSize: 11, margin: "0 0 2px", fontWeight: 600, textTransform: "uppercase" }}>Category</p>
+                <p style={{ color: C.black, fontWeight: 700, fontSize: 15, margin: 0 }}>Chronic pain</p>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {[["Neck", 7], ["Back", 5]].map(([label, score]) => (
+                  <div key={label} style={{ background: C.pp, borderRadius: 10, padding: "6px 12px", flex: 1 }}>
+                    <p style={{ color: C.muted, fontSize: 11, margin: 0 }}>{label}</p>
+                    <p style={{ color: C.black, fontWeight: 800, fontSize: 18, margin: 0 }}>{score}<span style={{ fontSize: 12, color: C.muted }}>/10</span></p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div style={{ background: C.pp, borderRadius: 14, padding: 14 }}>
+            <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", margin: "0 0 4px" }}>AI summary</p>
+            <p style={{ color: C.black, fontSize: 14, lineHeight: 1.5, margin: 0 }}>Case reports chronic neck and back pain for approximately 2 weeks. Neck is primary concern, rated 7/10. Described as dull ache on right side.</p>
+          </div>
+          <div style={{ marginTop: "auto", paddingTop: 16 }}>
+            <div style={{ height: 6, background: C.border, borderRadius: 999 }}>
+              <div style={{ height: "100%", background: C.pd, borderRadius: 999, width: ((10 - countdown) / 10 * 100) + "%", transition: "width 1s linear" }} />
+            </div>
+          </div>
+        </WCard>
+      </div>
+    </div>
+  );
+}
+
 function S15({ go }) {
   const TOTAL = 300;
   const [sec, setSec] = useState(TOTAL);
@@ -746,7 +883,7 @@ function S15({ go }) {
   const sr = useRef(null);
 
   useEffect(() => {
-    if (sec <= 0) { go("s13"); return; }
+    if (sec <= 0) { go("s16"); return; }
     const t = setTimeout(() => setSec((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [sec]);
@@ -798,6 +935,53 @@ function S15({ go }) {
   );
 }
 
+function S16({ go }) {
+  const [ready, setReady] = useState(false);
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+      <div style={{ padding: "8px 20px" }}><Tag>Healer view</Tag></div>
+      <div style={{ flex: 1, padding: "0 20px 32px", overflowY: "auto" }}>
+        <WCard>
+          <div style={{ width: 60, height: 60, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+            <span style={{ fontSize: 28 }}>✨</span>
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, margin: "0 0 6px", textAlign: "center", fontFamily: ff }}>Session complete</h2>
+          <p style={{ color: C.muted, fontSize: 14, textAlign: "center", margin: "0 0 20px" }}>Here's how the case responded</p>
+          <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+            {[["Neck", 7, 3], ["Back", 5, 2]].map(([label, before, after]) => (
+              <div key={label} style={{ flex: 1, background: C.pp, borderRadius: 14, padding: 14, textAlign: "center" }}>
+                <p style={{ color: C.muted, fontSize: 12, margin: "0 0 4px" }}>{label}</p>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
+                  <span style={{ color: C.muted, fontSize: 16 }}>{before}</span>
+                  <span style={{ color: C.light, fontSize: 12 }}>→</span>
+                  <span style={{ color: C.green, fontWeight: 800, fontSize: 20 }}>{after}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+            {[["19", "Sessions"], ["74%", "Change rate"], ["3.2", "Avg score"]].map(([v, l], i) => (
+              <div key={i} style={{ background: C.white, border: "1px solid " + C.border, borderRadius: 14, padding: 12, textAlign: "center" }}>
+                <p style={{ fontWeight: 900, fontSize: 18, margin: 0, color: C.pd }}>{v}</p>
+                <p style={{ fontSize: 10, color: C.muted, margin: "2px 0 0" }}>{l}</p>
+              </div>
+            ))}
+          </div>
+          <Inp placeholder="Optional notes (private)" style={{ marginBottom: 16 }} />
+          {!ready ? (
+            <Btn onClick={() => setReady(true)}>Ready for another session?</Btn>
+          ) : (
+            <div style={{ textAlign: "center" }}>
+              <p style={{ color: C.green, fontWeight: 700, fontSize: 15, margin: "0 0 12px" }}>You're back online</p>
+              <Btn primary={false} onClick={() => go("s13")}>Go to dashboard</Btn>
+            </div>
+          )}
+        </WCard>
+      </div>
+    </div>
+  );
+}
+
 function S17({ go }) {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
@@ -834,7 +1018,7 @@ function S18({ go }) {
             <Inp placeholder="CVC" style={{ flex: 1 }} />
           </div>
           <p style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>Auto refund if no match or session fails.</p>
-          <Btn onClick={() => go("s6")}>Pay and join queue</Btn>
+          <Btn onClick={() => go("sq")}>Pay and join queue</Btn>
         </WCard>
       </div>
     </div>
@@ -905,16 +1089,19 @@ function S21({ go }) {
 var SCREENS = {
   s1: { comp: S1, label: "1. Landing" },
   s2: { comp: S2, label: "2. Sign Up" },
-  s3: { comp: S3, label: "3. Age Gate" },
+  s3: { comp: S3, label: "3. Age Gate & DOB" },
   s4: { comp: S4, label: "4. Intake" },
-  s6: { comp: S6, label: "6. Choose Session" },
+  s6: { comp: S6, label: "5. Choose Session" },
+  sq: { comp: SQueue, label: "6. Queue" },
   s7: { comp: S7, label: "7. Ready Now" },
   s8: { comp: S8, label: "8. Symptom Confirm" },
   s9: { comp: S9, label: "9. Live Session" },
   s10: { comp: S10, label: "10. Session End" },
   s12: { comp: S12, label: "12. Healer Onboard" },
   s13: { comp: S13, label: "13. Healer Home" },
+  s14: { comp: S14, label: "14. Match Notification" },
   s15: { comp: S15, label: "15. Healer Session" },
+  s16: { comp: S16, label: "16. Healer Post-Session" },
   s17: { comp: S17, label: "17. No Symptoms" },
   s18: { comp: S18, label: "18. Payment" },
   s20: { comp: S20, label: "20. Settings" },
@@ -922,8 +1109,8 @@ var SCREENS = {
 };
 
 var GROUPS = [
-  { title: "Case Journey", keys: ["s1", "s2", "s3", "s4", "s6", "s7", "s8", "s9", "s10"] },
-  { title: "Healer", keys: ["s12", "s13", "s15"] },
+  { title: "Case Journey", keys: ["s1", "s2", "s3", "s4", "s6", "sq", "s7", "s8", "s9", "s10"] },
+  { title: "Healer", keys: ["s12", "s13", "s14", "s15", "s16"] },
   { title: "Other", keys: ["s17", "s18", "s20", "s21"] },
 ];
 
