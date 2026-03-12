@@ -286,55 +286,40 @@ function S1({ go }) {
   );
 }
 
-function SelField({ label, value, onChange, options, style }) {
-  return (
-    <div style={{ width: "100%", ...style }}>
-      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: C.black, marginBottom: 4, fontFamily: ff }}>{label}</label>
-      <select value={value} onChange={onChange} style={{ width: "100%", boxSizing: "border-box", background: "transparent", border: "none", borderBottom: "1.5px solid " + C.border, padding: "10px 0", color: value ? C.black : C.muted, fontSize: 15, fontFamily: ff, outline: "none", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 4px center" }}>
-        <option value="">Select</option>
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
-      </select>
-    </div>
-  );
-}
-
-function Chk({ checked, onChange, children }) {
-  return (
-    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: C.black, fontFamily: ff }}>
-      <div onClick={(e) => { e.preventDefault(); onChange(!checked); }} style={{ width: 20, height: 20, borderRadius: 4, border: "1.5px solid " + C.border, background: checked ? C.black : C.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-        {checked && <span style={{ color: C.white, fontSize: 12, fontWeight: 700 }}>✓</span>}
-      </div>
-      <span>{children}</span>
-    </label>
-  );
-}
-
 function S2({ go }) {
-  const [form, setForm] = useState({ first: "", last: "", gender: "", dob: "", email: "", country: "" });
-  const [privacy, setPrivacy] = useState(false);
-  const [terms, setTerms] = useState(false);
-  var valid = form.first && form.last && form.email && privacy && terms;
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.purple, padding: "12px 20px 20px" }}>
-        <button onClick={() => go("s1")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
-        </button>
-        <p style={{ color: C.black, fontSize: 13, margin: "0 0 2px", opacity: 0.7, fontFamily: ff }}>Let's get you set up</p>
-        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Add your details</h2>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
-        <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female"]} style={{ marginBottom: 20 }} />
-        <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
-        <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-          <Chk checked={privacy} onChange={setPrivacy}>I agree to the <u>Privacy Policy</u></Chk>
-          <Chk checked={terms} onChange={setTerms}>I accept the <u>Terms and Conditions</u></Chk>
-        </div>
-        <Btn disabled={!valid} onClick={() => go("s3")}>Next</Btn>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
+      <Hdr onBack={() => go("s1")} />
+      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+        <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          {!sent ? (
+            <>
+              <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, textAlign: "center", margin: "0 0 24px", fontFamily: ff }}>Create your account</h2>
+              <Inp value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" style={{ marginBottom: 12 }} />
+              <Btn onClick={() => email && setSent(true)}>Send magic link</Btn>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+                <span style={{ color: C.muted, fontSize: 13 }}>or</span>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Apple</Btn>
+                <Btn primary={false} style={{ flex: 1, fontSize: 14 }}>Google</Btn>
+              </div>
+            </>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+              <div style={{ width: 80, height: 80, borderRadius: 999, background: C.pp, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontSize: 40 }}>✉️</span>
+              </div>
+              <h3 style={{ color: C.black, fontWeight: 800, fontSize: 22, fontFamily: ff }}>Check your email</h3>
+              <p style={{ color: C.muted, fontSize: 15, textAlign: "center" }}>Magic link sent to<br /><strong style={{ color: C.black }}>{email}</strong></p>
+              <Btn onClick={() => go("s3")}>Continue (demo)</Btn>
+            </div>
+          )}
+        </WCard>
       </div>
     </div>
   );
@@ -363,44 +348,23 @@ function SLogin({ go }) {
 
 function S3({ go }) {
   const [step, setStep] = useState(0);
-  const [dob, setDob] = useState({ day: "", month: "", year: "" });
-  const dobValid = dob.day && dob.month && dob.year && dob.year.length === 4;
-  const getAge = () => {
-    if (!dobValid) return 0;
-    var bd = new Date(Number(dob.year), Number(dob.month) - 1, Number(dob.day));
-    var diff = Date.now() - bd.getTime();
-    return Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000));
-  };
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.purple }}>
-      <Hdr onBack={() => step > 0 ? setStep(s => s - 1) : go("s2")} />
+      <Hdr onBack={() => go("s2")} />
       <div style={{ flex: 1, padding: "0 20px 32px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
           {step === 0 ? (
             <>
-              <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, lineHeight: 1.2, margin: "0 0 8px", fontFamily: ff }}>Date of birth</h2>
-              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>We need this to verify your age</p>
-              <div style={{ display: "flex", gap: 10, width: "100%", marginBottom: 16 }}>
-                <Inp value={dob.day} onChange={(e) => setDob(d => ({ ...d, day: e.target.value.replace(/\D/g, "").slice(0, 2) }))} placeholder="DD" style={{ flex: 1, textAlign: "center" }} />
-                <Inp value={dob.month} onChange={(e) => setDob(d => ({ ...d, month: e.target.value.replace(/\D/g, "").slice(0, 2) }))} placeholder="MM" style={{ flex: 1, textAlign: "center" }} />
-                <Inp value={dob.year} onChange={(e) => setDob(d => ({ ...d, year: e.target.value.replace(/\D/g, "").slice(0, 4) }))} placeholder="YYYY" style={{ flex: 2, textAlign: "center" }} />
-              </div>
-              <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.5, margin: "0 0 20px" }}>ENNIE is not a medical service. Energy healing is complementary — it does not replace professional medical advice, diagnosis, or treatment.</p>
-              <Btn disabled={!dobValid || getAge() < 13} onClick={() => setStep(1)}>{!dobValid ? "Enter your date of birth" : getAge() < 13 ? "You must be 13 or older" : "Continue"}</Btn>
-            </>
-          ) : step === 1 ? (
-            <>
               <div style={{ width: 48, height: 48, borderRadius: 999, border: "2px solid " + C.black, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
                 <span style={{ fontSize: 22, fontWeight: 700 }}>!</span>
               </div>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: C.black, lineHeight: 1.2, margin: "0 0 16px", fontFamily: ff }}>Are you in a medical emergency?</h2>
-              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>ENNIE is not suitable for emergencies. If you need urgent help, please call your local emergency services.</p>
-              <Btn onClick={() => setStep(2)}>No — not an emergency</Btn>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: C.black, lineHeight: 1.2, margin: "0 0 16px", fontFamily: ff }}>Are you in a medical emergency or require medical or psychological assistance?</h2>
+              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>Ennie is not suitable for emergencies. If you have severe symptoms, please consult a licensed healthcare provider or call your local emergency services.</p>
+              <Btn onClick={() => setStep(1)}>Not an emergency</Btn>
             </>
           ) : (
             <>
-              <h2 style={{ fontSize: 28, fontWeight: 800, color: C.black, margin: "0 0 12px", fontFamily: ff }}>Do you have active symptoms right now?</h2>
-              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>Free sessions require symptoms you can rate in real time during the session.</p>
+              <h2 style={{ fontSize: 30, fontWeight: 800, color: C.black, margin: "0 0 28px", fontFamily: ff }}>Do you have symptoms now?</h2>
               <div style={{ display: "flex", gap: 12, width: "100%" }}>
                 <Btn primary={false} onClick={() => go("s17")} style={{ flex: 1 }}>No</Btn>
                 <Btn onClick={() => go("s4")} style={{ flex: 1 }}>Yes</Btn>
@@ -1009,94 +973,41 @@ function S10({ go }) {
 }
 
 function S12({ go }) {
-  const [slide, setSlide] = useState(0);
-  var slides = [
-    "Are you ready to transform lives for the better?",
-    "Ennie makes energy healing accessible to anyone, anywhere.",
-    "We securely connect test energy healers and users, protecting your data and privacy and conducting testing to ensure our test energy healers remain effective based on user feedback.",
-  ];
-  var next = useCallback(() => { setSlide((s) => (s + 1) % slides.length); haptic(); }, []);
-  var prev = useCallback(() => { setSlide((s) => (s - 1 + slides.length) % slides.length); haptic(); }, []);
-  var swipe = useSwipe(next, prev);
+  const [step, setStep] = useState(0);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.yellow }}>
-      <Hdr onBack={() => go("s1")} />
-      <div style={{ padding: "0 24px", marginBottom: 8 }}>
-        <p style={{ color: C.black, fontSize: 14, fontWeight: 500, margin: "0 0 4px", opacity: 0.7, fontFamily: ff }}>For test energy healers</p>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: C.black, lineHeight: 1.15, margin: 0, fontFamily: ff }}>Energy healing begins here</h1>
-      </div>
-      <div style={{ flex: 1, padding: "12px 24px", display: "flex", flexDirection: "column" }}>
-        <div {...swipe} style={{ background: C.white, borderRadius: 20, padding: 20, flex: 1, display: "flex", flexDirection: "column", border: "3px solid " + C.yd, boxShadow: "0 4px 24px rgba(200,180,40,0.15)" }}>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
-            <button onClick={prev} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>‹</button>
-            <div style={{ background: C.black, borderRadius: 999, padding: "6px 14px", display: "flex", gap: 8 }}>
-              {slides.map((_, i) => (
-                <div key={i} style={{ width: i === slide ? 20 : 8, height: 8, borderRadius: 999, background: i === slide ? C.white : "rgba(255,255,255,0.3)", transition: "all 0.3s" }} />
-              ))}
-            </div>
-            <button onClick={next} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.black, padding: 4 }}>›</button>
+      <Hdr title="Become a test healer" onBack={() => step > 0 ? setStep((s) => s - 1) : go("s1")} />
+      <div style={{ flex: 1, padding: "0 20px 32px" }}>
+        <WCard style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          <p style={{ color: C.muted, fontSize: 12, marginBottom: 16 }}>Step {step + 1} of 3</p>
+          {step === 0 && (
+            <>
+              <Inp placeholder="Language" style={{ marginBottom: 10 }} />
+              <Inp placeholder="Healing modality" style={{ marginBottom: 10 }} />
+              <Inp placeholder="Timezone" style={{ marginBottom: 16 }} />
+              <Btn onClick={() => setStep(1)}>Next</Btn>
+            </>
+          )}
+          {step === 1 && (
+            <>
+              <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 16px" }}>Do you have experience?</h3>
+              <Btn onClick={() => setStep(2)} style={{ marginBottom: 10 }}>Yes</Btn>
+              <Btn primary={false} onClick={() => setStep(2)}>No — show me training</Btn>
+            </>
+          )}
+          {step === 2 && (
+            <>
+              <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 12px" }}>Platform rules</h3>
+              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 20px" }}>Sessions are AI-mediated and anonymous. No recordings.</p>
+              <Btn onClick={() => go("s13")}>I accept — join healer pool</Btn>
+            </>
+          )}
+          <div style={{ marginTop: "auto", display: "flex", justifyContent: "center", gap: 8, paddingTop: 16 }}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} style={{ width: i === step ? 20 : 8, height: 8, borderRadius: 999, background: i === step ? C.black : C.border, transition: "all 0.3s" }} />
+            ))}
           </div>
-          <p style={{ fontSize: 16, fontWeight: 600, color: C.black, textAlign: "center", lineHeight: 1.5, margin: "0 0 16px", fontFamily: ff, minHeight: 54 }}>{slides[slide]}</p>
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <HandArt />
-          </div>
-        </div>
-      </div>
-      <div style={{ padding: "12px 24px 32px", display: "flex", gap: 12 }}>
-        <Btn onClick={() => go("sHReg")} style={{ flex: 1 }}>Join waitlist</Btn>
-        <Btn primary={false} onClick={() => go("sHLogin")} style={{ flex: 1 }}>Log in</Btn>
-      </div>
-    </div>
-  );
-}
-
-function SHReg({ go }) {
-  const [form, setForm] = useState({ first: "", last: "", gender: "", dob: "", email: "", country: "" });
-  const [privacy, setPrivacy] = useState(false);
-  const [terms, setTerms] = useState(false);
-  var valid = form.first && form.last && form.email && privacy && terms;
-  return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.yellow, padding: "12px 20px 20px" }}>
-        <button onClick={() => go("s12")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
-        </button>
-        <p style={{ color: C.black, fontSize: 13, margin: "0 0 2px", opacity: 0.7, fontFamily: ff }}>Let's get you set up</p>
-        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Add your details</h2>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 32px" }}>
-        <Inp label="First Name" value={form.first} onChange={(e) => setForm((f) => ({ ...f, first: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <Inp label="Last Name" value={form.last} onChange={(e) => setForm((f) => ({ ...f, last: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <SelField label="Gender" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} options={["Male", "Female"]} style={{ marginBottom: 20 }} />
-        <Inp label="Date of birth" value={form.dob} onChange={(e) => setForm((f) => ({ ...f, dob: e.target.value }))} placeholder="Select a date" style={{ marginBottom: 20 }} />
-        <Inp label="Add your email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="Enter" style={{ marginBottom: 20 }} />
-        <SelField label="Country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} options={["Australia", "United States", "United Kingdom", "Canada", "New Zealand", "Other"]} style={{ marginBottom: 24 }} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-          <Chk checked={privacy} onChange={setPrivacy}>I agree to the <u>Privacy Policy</u></Chk>
-          <Chk checked={terms} onChange={setTerms}>I accept the <u>Terms and Conditions</u></Chk>
-        </div>
-        <Btn disabled={!valid} onClick={() => go("s13")}>Next</Btn>
-      </div>
-    </div>
-  );
-}
-
-function SHLogin({ go }) {
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ background: C.yellow, padding: "12px 20px 20px" }}>
-        <button onClick={() => go("s12")} style={{ width: 32, height: 32, borderRadius: 999, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-          <span style={{ color: C.white, fontSize: 14, fontWeight: 700 }}>✕</span>
-        </button>
-        <h2 style={{ fontSize: 26, fontWeight: 900, color: C.black, margin: 0, fontFamily: ff }}>Log in to Ennie</h2>
-      </div>
-      <div style={{ flex: 1, padding: "32px 24px" }}>
-        <Inp label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter" style={{ marginBottom: 24 }} />
-        <Inp label="Password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Enter" style={{ marginBottom: 32 }} />
-        <Btn onClick={() => go("s13")}>Log in</Btn>
-        <p onClick={() => {}} style={{ color: C.black, fontSize: 14, textAlign: "center", marginTop: 20, cursor: "pointer", textDecoration: "underline", fontFamily: ff }}>Forgot password?</p>
+        </WCard>
       </div>
     </div>
   );
@@ -1534,7 +1445,7 @@ var SCREENS = {
   s1: { comp: S1, label: "1. Landing" },
   sLogin: { comp: SLogin, label: "1b. Login" },
   s2: { comp: S2, label: "2. Sign Up" },
-  s3: { comp: S3, label: "3. Age Gate & DOB" },
+  s3: { comp: S3, label: "3. Emergency Check" },
   s4: { comp: S4, label: "4. Intake" },
   s6: { comp: S6, label: "5. Choose Session" },
   sq: { comp: SQueue, label: "6. Queue" },
@@ -1543,8 +1454,6 @@ var SCREENS = {
   s9: { comp: S9, label: "9. Live Session" },
   s10: { comp: S10, label: "10. Session End" },
   s12: { comp: S12, label: "12. Healer Landing" },
-  sHReg: { comp: SHReg, label: "12b. Healer Sign Up" },
-  sHLogin: { comp: SHLogin, label: "12c. Healer Login" },
   s13: { comp: S13, label: "13. Healer Dashboard" },
   s14: { comp: S14, label: "14. Match Notification" },
   s15: { comp: S15, label: "15. Healer Session" },
@@ -1558,7 +1467,7 @@ var SCREENS = {
 
 var GROUPS = [
   { title: "Case Journey", keys: ["s1", "sLogin", "s2", "s3", "s4", "s6", "sq", "s7", "s8", "s9", "s10"] },
-  { title: "Healer", keys: ["s12", "sHReg", "sHLogin", "s13", "s14", "s15", "s16"] },
+  { title: "Healer", keys: ["s12", "s13", "s14", "s15", "s16"] },
   { title: "Other", keys: ["s17", "s18", "s20", "s21", "s22"] },
 ];
 
