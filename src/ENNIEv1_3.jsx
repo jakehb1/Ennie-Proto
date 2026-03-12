@@ -53,7 +53,7 @@ const C = {
   yd: "#D4B52E",
 };
 
-const ff = "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif";
+const ff = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
 /* ===== SPARKLINE CHART ===== */
 function Sparkline({ data, width, height, color, showLabels }) {
