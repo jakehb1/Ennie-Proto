@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { speak, stopSpeaking } from "./tts.js";
 
 function haptic(style) {
   if (navigator.vibrate) navigator.vibrate(style === "heavy" ? 30 : 10);
@@ -432,7 +433,9 @@ function S4({ go }) {
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      setMsgs((m) => [...m, { from: "ai", text: rep[step] || "Thanks." }]);
+      var reply = rep[step] || "Thanks.";
+      setMsgs((m) => [...m, { from: "ai", text: reply }]);
+      speak(reply);
       if (step === 0) setShowMap(true);
       setStep((s) => s + 1);
     }, 800);
@@ -443,7 +446,9 @@ function S4({ go }) {
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      setMsgs((m) => [...m, { from: "ai", text: rep[Math.min(step + 1, rep.length - 1)] }]);
+      var reply = rep[Math.min(step + 1, rep.length - 1)];
+      setMsgs((m) => [...m, { from: "ai", text: reply }]);
+      speak(reply);
       setStep((s) => Math.max(s, 2));
     }, 600);
   };
@@ -640,6 +645,8 @@ function S9({ go }) {
   const [msgs, setMsgs] = useState([{ from: "system", text: "Round 1 · Session started" }, { from: "healer", text: "Hi. Neck at 7, back at 5. Is the neck pain more left or right?" }]);
   const [lastH, setLastH] = useState("Is the neck pain more left or right?");
 
+  useEffect(() => { speak("Hi. Neck at 7, back at 5. Is the neck pain more left or right?"); return () => stopSpeaking(); }, []);
+
   var fups = [{ at: 260, text: "Sharp or dull ache?" }, { at: 220, text: "When did it start?" }, { at: 180, text: "Working on it now. Let me know if anything shifts." }, { at: 130, text: "How's the neck now vs when we started?" }];
 
   useEffect(() => {
@@ -654,6 +661,7 @@ function S9({ go }) {
       setSp("healer");
       setLastH(fu.text);
       setMsgs((m) => [...m, { from: "healer", text: fu.text }]);
+      speak(fu.text);
       setTimeout(() => setSp("idle"), 2500);
     }
   }, [sec]);
@@ -685,6 +693,7 @@ function S9({ go }) {
           setSp("healer");
           setLastH(t);
           setMsgs((m) => [...m, { from: "healer", text: t }]);
+          speak(t);
           setTimeout(() => setSp("idle"), 2000);
         }, 500);
       }, 400);
@@ -1048,6 +1057,8 @@ function S15({ go }) {
   const sr = useRef(null);
   const [wf, setWf] = useState(0);
 
+  useEffect(() => { return () => stopSpeaking(); }, []);
+
   useEffect(() => {
     if (sec <= 0) { go("s16"); return; }
     const t = setTimeout(() => setSec((s) => s - 1), 1000);
@@ -1065,9 +1076,9 @@ function S15({ go }) {
 
   // Simulate case updates at certain times
   useEffect(() => {
-    if (sec === 250) setMsgs((m) => [...m, { from: "system", text: "Case reports: neck feels slightly lighter" }]);
+    if (sec === 250) { setMsgs((m) => [...m, { from: "system", text: "Case reports: neck feels slightly lighter" }]); speak("Case reports: neck feels slightly lighter"); }
     if (sec === 250) setPins((p) => p.map((pin) => pin.label === "Neck" ? { ...pin, score: 5 } : pin));
-    if (sec === 200) setMsgs((m) => [...m, { from: "system", text: "Case tapped 'I feel a change'" }]);
+    if (sec === 200) { setMsgs((m) => [...m, { from: "system", text: "Case tapped 'I feel a change'" }]); speak("Case tapped I feel a change"); }
     if (sec === 200) setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 1) })));
   }, [sec]);
 
