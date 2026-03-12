@@ -9,7 +9,7 @@ function Ico({ name, size, color }) {
   var c = color || "currentColor";
   var sw = s <= 16 ? 1.5 : 1.75;
   var Icon = iconMap[name] || iconMap.star;
-  return <Icon width={s} height={s} color={c} strokeWidth={sw} style={{ display: "block" }} />;
+  return <Icon width={s} height={s} color={c} strokeWidth={sw} style={{ display: "block", flexShrink: 0, overflow: "visible" }} />;
 }
 
 function haptic(style) {
@@ -283,7 +283,7 @@ function TabBar({ go, active }) {
       {items.map(function (item) {
         var isActive = active === item[1];
         return (
-          <div key={item[1]} onClick={() => { haptic(); go(item[2]); }} style={{ flex: 1, textAlign: "center", padding: "14px 0 10px", cursor: "pointer", transition: "all 0.2s" }}>
+          <div key={item[1]} onClick={() => { haptic(); go(item[2]); }} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "14px 0 10px", cursor: "pointer", transition: "all 0.2s" }}>
             <Ico name={item[0]} size={22} color={isActive ? C.black : C.muted} />
             <p style={{ fontSize: 11, color: isActive ? C.black : C.muted, fontWeight: isActive ? 600 : 400, margin: "6px 0 0", letterSpacing: 0.1, fontFamily: ff }}>{item[1]}</p>
           </div>
@@ -1626,9 +1626,9 @@ function S21({ go }) {
         <p style={{ color: C.pp, fontSize: 14, fontWeight: 400, margin: 0 }}>At a glance</p>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "22px 24px 8px" }}>
-        <div style={{ display: "flex", gap: 12, marginBottom: 20, overflowX: "auto", paddingBottom: 4 }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
           {[{ t: "Unlimited free sessions with test healers", icon: "star" }, { t: "Rate symptoms in real time", icon: "chart" }].map((item, i) => (
-            <div key={i} style={{ minWidth: 185, background: C.white, borderRadius: 16, padding: "20px 18px", border: "1px solid " + C.borderLight }}>
+            <div key={i} style={{ flex: 1, minWidth: 0, background: C.white, borderRadius: 16, padding: "20px 18px", border: "1px solid " + C.borderLight }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
                 <Ico name={item.icon} size={18} color={C.pd} />
               </div>
