@@ -422,17 +422,23 @@ function S3({ go }) {
   const [step, setStep] = useState(0);
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <Hdr onBack={() => go("s2")} />
+      <div style={{ padding: "16px 20px 0" }}>
+        <button onClick={() => go("s2")} style={{ width: 40, height: 40, borderRadius: 12, background: C.black, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ color: C.white, fontSize: 16, fontWeight: 500 }}>✕</span>
+        </button>
+      </div>
       <div style={{ flex: 1, padding: "0 24px 36px" }}>
         <WCard style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
           {step === 0 ? (
             <>
-              <div style={{ width: 48, height: 48, borderRadius: 999, border: "2px solid " + C.black, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-                <span style={{ fontSize: 22, fontWeight: 600 }}>!</span>
+              <div style={{ flex: 1 }} />
+              <div style={{ width: 48, height: 48, borderRadius: 999, border: "1.5px solid " + C.black, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+                <span style={{ fontSize: 22, fontWeight: 600, color: C.black }}>!</span>
               </div>
-              <h2 style={{ fontSize: 24, fontWeight: 700, color: C.black, lineHeight: 1.2, margin: "0 0 16px", fontFamily: ff }}>Are you in a medical emergency or require medical or psychological assistance?</h2>
-              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>Ennie is not suitable for emergencies. If you have severe symptoms, please consult a licensed healthcare provider or call your local emergency services.</p>
-              <Btn onClick={() => setStep(1)}>Not an emergency</Btn>
+              <h2 style={{ fontSize: 26, fontWeight: 700, color: C.black, lineHeight: 1.25, margin: "0 0 16px", fontFamily: ff }}>Are you in a medical emergency or require medical or psychological assistance?</h2>
+              <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.6, margin: "0 0 32px" }}>Ennie is not suitable for emergencies. If you have severe symptoms, please consult a licensed healthcare provider or call your local emergency services.</p>
+              <Btn onClick={() => setStep(1)} style={{ background: C.black, width: "100%" }}>Not an emergency</Btn>
+              <div style={{ flex: 1 }} />
             </>
           ) : (
             <>
