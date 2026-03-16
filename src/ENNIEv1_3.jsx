@@ -1594,51 +1594,68 @@ function S22({ go }) {
 }
 
 function S21({ go }) {
+  var lastSession = { title: "Neck & back pain", date: "Today", areas: [["Neck", 7, 3], ["Back", 5, 2]] };
+  var chartData = [8, 6, 5, 3];
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.white }}>
-      <div style={{ padding: "28px 28px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Ico name="hands" size={18} color={C.pd} />
-            </div>
-            <span style={{ fontWeight: 600, fontSize: 18, color: C.black, fontFamily: ff, letterSpacing: -0.2 }}>Ennie</span>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
+      <div style={{ background: C.white, padding: "28px 24px 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+          <div>
+            <p style={{ color: C.muted, fontSize: 13, margin: "0 0 2px", fontFamily: ff }}>Welcome back</p>
+            <h2 style={{ color: C.black, fontWeight: 700, fontSize: 22, margin: 0, fontFamily: ff, letterSpacing: -0.3 }}>Your dashboard</h2>
           </div>
-          <Badge color={C.muted} bg={C.bg}>3 sessions</Badge>
+          <div style={{ width: 40, height: 40, borderRadius: 999, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Ico name="user" size={18} color={C.black} />
+          </div>
         </div>
-        <h2 style={{ color: C.black, fontWeight: 700, fontSize: 24, margin: "0 0 4px", fontFamily: ff, letterSpacing: -0.5 }}>Your healing journey</h2>
-        <p style={{ color: C.muted, fontSize: 14, fontWeight: 400, margin: 0 }}>At a glance</p>
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "24px 24px 8px" }}>
-        <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-          {[{ t: "Unlimited free sessions with test healers", icon: "star" }, { t: "Rate symptoms in real time", icon: "chart" }].map((item, i) => (
-            <div key={i} style={{ flex: 1, minWidth: 0, background: C.bg, borderRadius: 16, padding: "20px 18px" }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.white, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                <Ico name={item.icon} size={18} color={C.black} />
-              </div>
-              <p style={{ fontSize: 14, color: C.black, margin: 0, lineHeight: 1.5, fontWeight: 500 }}>{item.t}</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          {[["3", "Sessions"], ["57%", "Avg change"], ["4.2", "Avg score"]].map(([v, l], i) => (
+            <div key={i} style={{ background: C.bg, borderRadius: 14, padding: "14px 12px", textAlign: "center" }}>
+              <p style={{ fontWeight: 700, fontSize: 20, margin: 0, color: C.black, fontFamily: ff }}>{v}</p>
+              <p style={{ fontSize: 11, color: C.muted, margin: "2px 0 0" }}>{l}</p>
             </div>
           ))}
         </div>
-        <div onClick={() => go("s3")} style={{ background: C.black, borderRadius: 18, padding: "26px 24px", marginBottom: 14, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px 8px" }}>
+        <button onClick={() => go("s3")} style={{ width: "100%", background: C.black, borderRadius: 18, padding: "22px 22px", marginBottom: 16, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", border: "none", textAlign: "left" }}>
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 6px", fontFamily: ff, color: C.white, letterSpacing: -0.2 }}>Start a session</h3>
-            <p style={{ fontSize: 13, color: C.light, fontWeight: 400, margin: 0 }}>Free with test healers</p>
+            <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px", fontFamily: ff, color: C.white, letterSpacing: -0.2 }}>Start a session</h3>
+            <p style={{ fontSize: 13, color: C.light, fontWeight: 400, margin: 0, fontFamily: ff }}>Free with test healers</p>
           </div>
-          <div style={{ width: 44, height: 44, borderRadius: 14, background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Ico name="arrow" size={18} color={C.white} />
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Ico name="arrow" size={16} color={C.white} />
           </div>
+        </button>
+        <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>Pain trend</p>
+        <div style={{ background: C.white, borderRadius: 16, padding: "18px 16px 14px", marginBottom: 20, border: "1px solid " + C.borderLight }}>
+          <Sparkline data={chartData} width={340} height={60} color={C.green} showLabels />
         </div>
-        <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-          <div onClick={() => go("s19")} style={{ flex: 1, background: C.bg, borderRadius: 16, padding: "20px 18px", cursor: "pointer" }}>
-            <div style={{ marginBottom: 10 }}><Ico name="star" size={20} color={C.black} /></div>
-            <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 4px", fontFamily: ff }}>How it works</p>
-            <p style={{ fontSize: 13, color: C.muted, fontWeight: 400, margin: 0 }}>Learn about Ennie</p>
+        <p style={{ color: C.muted, fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 10px" }}>Last session</p>
+        <div style={{ background: C.white, borderRadius: 16, padding: 18, marginBottom: 16, border: "1px solid " + C.borderLight }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: C.black, margin: 0, fontFamily: ff }}>{lastSession.title}</h3>
+            <span style={{ fontSize: 12, color: C.muted }}>{lastSession.date}</span>
           </div>
-          <div onClick={() => go("s17")} style={{ flex: 1, background: C.bg, borderRadius: 16, padding: "20px 18px", cursor: "pointer" }}>
-            <div style={{ marginBottom: 10 }}><Ico name="bolt" size={20} color={C.black} /></div>
-            <p style={{ fontSize: 14, fontWeight: 600, margin: "0 0 4px", fontFamily: ff }}>Paid sessions</p>
-            <p style={{ fontSize: 13, color: C.muted, fontWeight: 400, margin: 0 }}>Skip the queue</p>
+          {lastSession.areas.map(([label, before, after]) => (
+            <div key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderTop: "1px solid " + C.borderLight }}>
+              <span style={{ fontSize: 14, color: C.black, fontWeight: 500 }}>{label}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 14, color: C.muted }}>{before}</span>
+                <span style={{ fontSize: 12, color: C.light }}>→</span>
+                <span style={{ fontSize: 14, color: C.green, fontWeight: 700 }}>{after}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+          <div onClick={() => go("s19")} style={{ flex: 1, background: C.white, borderRadius: 14, padding: "16px 14px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
+            <Ico name="info" size={16} color={C.black} />
+            <p style={{ fontSize: 13, fontWeight: 600, margin: "8px 0 0", fontFamily: ff, color: C.black }}>About Ennie</p>
+          </div>
+          <div onClick={() => go("s17")} style={{ flex: 1, background: C.white, borderRadius: 14, padding: "16px 14px", cursor: "pointer", border: "1px solid " + C.borderLight }}>
+            <Ico name="bolt" size={16} color={C.black} />
+            <p style={{ fontSize: 13, fontWeight: 600, margin: "8px 0 0", fontFamily: ff, color: C.black }}>Paid sessions</p>
           </div>
         </div>
       </div>
