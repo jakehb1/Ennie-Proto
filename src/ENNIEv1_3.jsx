@@ -948,15 +948,12 @@ function S9({ go, intakeData }) {
               {sp === "healer" && <p style={{ color: C.muted, fontSize: 13, textAlign: "center", margin: "6px 0 0", fontStyle: "italic" }}>"{lastH}"</p>}
               {interim && sp === "idle" && <p style={{ color: C.green, fontSize: 13, textAlign: "center", margin: "6px 0 0", fontStyle: "italic" }}>"{interim}"</p>}
             </div>
-            <div style={{ padding: "10px 16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
-              <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); speak("Good — I felt that. Continuing."); }} style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 15, color: C.white }}>I feel a change</button>
-              <div style={{ display: "flex", gap: 8 }}>
-                <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + (listening ? C.green : C.border), textAlign: "center", background: listening ? C.green + "11" : "transparent" }}>
-                  <span style={{ color: listening ? C.green : C.muted, fontSize: 13 }}>{listening ? "Mic active" : "Mic off"}</span>
-                </div>
-                <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.bg, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 13, color: C.black }}>End</button>
-                <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 500, fontSize: 11, color: C.red }}>Help</button>
+            <div style={{ padding: "10px 16px 20px", display: "flex", gap: 8 }}>
+              <div style={{ flex: 1, padding: 12, borderRadius: 14, border: "1.5px solid " + (listening ? C.green : C.border), textAlign: "center", background: listening ? C.green + "11" : "transparent" }}>
+                <span style={{ color: listening ? C.green : C.muted, fontSize: 13 }}>{listening ? "Mic active" : "Mic off"}</span>
               </div>
+              <button onClick={() => go("s10")} style={{ padding: "0 16px", borderRadius: 14, background: C.bg, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 13, color: C.black }}>End</button>
+              <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 500, fontSize: 11, color: C.red }}>Help</button>
             </div>
           </>
         ) : (
@@ -988,7 +985,6 @@ function S9({ go, intakeData }) {
                 </button>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => { setSec(TOTAL); setRound((r) => r + 1); setPins((p) => p.map((pin) => ({ ...pin, score: Math.max(1, pin.score - 2) }))); setMsgs((m) => [...m, { from: "system", text: "Round " + (round + 1) + " · Improvement detected" }, { from: "healer", text: "Good — I felt that. Continuing." }]); }} style={{ flex: 1, padding: "10px 14px", borderRadius: 14, background: C.green, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 13, color: C.white }}>I feel a change</button>
                 <button onClick={() => go("s10")} style={{ padding: "0 14px", borderRadius: 14, background: C.bg, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 12, color: C.black }}>End</button>
                 <button onClick={() => { setMsgs((m) => [...m, { from: "system", text: "If this is a medical emergency, call your local emergency number. ENNIE is not a medical service." }]); }} style={{ padding: "0 12px", borderRadius: 14, background: C.white, border: "1.5px solid " + C.red, cursor: "pointer", fontFamily: ff, fontWeight: 500, fontSize: 11, color: C.red }}>Help</button>
               </div>
