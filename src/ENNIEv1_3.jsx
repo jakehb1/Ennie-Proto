@@ -331,46 +331,28 @@ function HandArt({ style }) {
 }
 
 function S1({ go }) {
-  const [slide, setSlide] = useState(0);
-  var slides = [
-    { text: "Ennie is built by world-renowned energy healer Charlie Goldsmith.", icon: "hands" },
-    { text: "Connect to a test energy healer, 100% remotely and anonymously.", icon: "lock" },
-    { text: "Rate your symptoms in real time during your session.", icon: "chart" },
-  ];
-  var next = useCallback(() => { setSlide((s) => (s + 1) % slides.length); haptic(); }, []);
-  var prev = useCallback(() => { setSlide((s) => (s - 1 + slides.length) % slides.length); haptic(); }, []);
-  var swipe = useSwipe(next, prev);
+  var dark = "#0C1318";
+  var teal = "#4BBFAB";
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.pd }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: dark }}>
       <div style={{ padding: "28px 28px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 36 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Ico name="hands" size={20} color={C.pd} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 38, height: 38, borderRadius: 999, background: teal, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ color: C.white, fontSize: 16, fontWeight: 700 }}>E</span>
           </div>
-          <span style={{ fontWeight: 600, fontSize: 20, color: C.white, fontFamily: ff, letterSpacing: -0.3 }}>Ennie</span>
-        </div>
-        <p style={{ color: C.pp, fontSize: 15, fontWeight: 400, margin: "0 0 8px", fontFamily: ff }}>Suffering from pain?</p>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.white, lineHeight: 1.2, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Your energy healing<br />journey begins here</h1>
-      </div>
-      <div style={{ flex: 1, padding: "28px 28px 0", display: "flex", flexDirection: "column" }}>
-        <div {...swipe} style={{ background: C.white, borderRadius: 20, padding: 28, flex: 1, display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 24 }}>
-            {slides.map((_, i) => (
-              <div key={i} onClick={() => { setSlide(i); haptic(); }} style={{ width: i === slide ? 24 : 8, height: 8, borderRadius: 999, background: i === slide ? C.pd : C.border, transition: "all 0.3s", cursor: "pointer" }} />
-            ))}
-          </div>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ width: 64, height: 64, borderRadius: 16, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
-              <Ico name={slides[slide].icon} size={28} color={C.pd} />
-            </div>
-            <p style={{ fontSize: 16, fontWeight: 400, color: C.black, textAlign: "center", lineHeight: 1.6, margin: "0 0 24px", fontFamily: ff, minHeight: 54 }}>{slides[slide].text}</p>
-          </div>
-          <HandArt style={{ maxHeight: 130, opacity: 0.5 }} />
+          <span style={{ fontWeight: 700, fontSize: 18, color: C.white, fontFamily: ff, letterSpacing: 0.5 }}>ENNIE</span>
         </div>
       </div>
-      <div style={{ padding: "20px 28px 40px", display: "flex", gap: 14 }}>
-        <Btn onClick={() => go("s2")} style={{ flex: 1, background: C.white, color: C.black }}>Join waitlist</Btn>
-        <Btn primary={false} onClick={() => go("sLogin")} style={{ flex: 1, background: "transparent", color: C.white, border: "1.5px solid rgba(255,255,255,0.35)" }}>Log in</Btn>
+      <div style={{ flex: 1 }} />
+      <div style={{ padding: "0 28px" }}>
+        <h1 style={{ fontSize: 36, fontWeight: 700, color: C.white, lineHeight: 1.15, margin: 0, fontFamily: ff, letterSpacing: -0.5 }}>Welcome to<br /><span style={{ color: teal }}>ENNIE.</span></h1>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 16, margin: "14px 0 16px", fontFamily: ff }}>Energy healing for anyone, anywhere.</p>
+        <span style={{ display: "inline-block", fontSize: 14, color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 999, padding: "7px 18px", fontFamily: ff }}>Suffering from pain?</span>
+      </div>
+      <div style={{ padding: "40px 28px 48px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <button onClick={() => go("s2")} style={{ width: "100%", padding: "16px 0", borderRadius: 16, background: teal, border: "none", cursor: "pointer", fontFamily: ff, fontWeight: 600, fontSize: 16, color: C.white, letterSpacing: 0.2 }}>Get started for FREE</button>
+        <button onClick={() => go("s13")} style={{ width: "100%", padding: "16px 0", borderRadius: 16, background: "transparent", border: "1.5px solid rgba(255,255,255,0.2)", cursor: "pointer", fontFamily: ff, fontWeight: 500, fontSize: 15, color: "rgba(255,255,255,0.7)" }}>Join as a test healer</button>
+        <p onClick={() => go("sLogin")} style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "4px 0 0", cursor: "pointer", fontFamily: ff }}>Login</p>
       </div>
     </div>
   );
